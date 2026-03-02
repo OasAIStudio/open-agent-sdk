@@ -21,6 +21,7 @@
 <div align="center">
   <img src="./docs/branding/pixel-demo.svg" alt="Open Agent SDK Demo" width="100%">
 </div>
+
 - ReAct-style agent loop with multi-turn execution
 - Built-in toolset for files, shell, search, web, and task orchestration
 - Session persistence with resume and fork support
