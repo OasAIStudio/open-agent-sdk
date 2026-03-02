@@ -1,10 +1,16 @@
-# Open Agent SDK
-
 <div align="center">
   <img src="./docs/branding/pixel-banner.svg" alt="Open Agent SDK Banner" width="100%">
-</div>
 
-TypeScript SDK for building production-grade AI agents with tool use and multi-provider support.
+  <h1>Open Agent SDK</h1>
+
+  <p><strong>TypeScript SDK for building production-grade AI agents with tool use and multi-provider support.</strong></p>
+
+  <p>
+    <a href="https://twitter.com/octane0411"><img src="https://img.shields.io/badge/Build%20in%20Public-blue" alt="Build in Public"></a>
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0+-blue" alt="TypeScript"></a>
+  </p>
+</div>
 
 - Compatible developer experience with Claude Agent SDK concepts
 - Open and extensible architecture for custom tools, providers, and hooks
