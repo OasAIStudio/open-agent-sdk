@@ -1,9 +1,8 @@
 <svg width="800" height="240" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="premium-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#58a6ff" />
-      <stop offset="50%" stop-color="#a371f7" />
-      <stop offset="100%" stop-color="#f778ba" />
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
     </linearGradient>
   </defs>
   <style>
@@ -30,7 +29,7 @@
   <text x="80" y="180" class="text-cmd">Initializing Agent Loop...<tspan class="cursor"> █</tspan></text>
 
   <!-- Pixel Art Robot -->
-  <g transform="translate(600, 40) scale(6)" fill="#58a6ff">
+  <g transform="translate(600, 40) scale(6)" fill="#4facfe">
     <rect x="4" y="2" width="8" height="6"/>
     <rect x="5" y="4" width="2" height="2" fill="#0d1117"/>
     <rect x="9" y="4" width="2" height="2" fill="#0d1117"/>
