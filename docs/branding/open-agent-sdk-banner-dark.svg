@@ -1,33 +1,23 @@
 <svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Open Agent SDK banner logo dark</title>
-  <desc id="desc">Horizontal logo with geometric node mark and Open Agent SDK wordmark for dark backgrounds.</desc>
+  <desc id="desc">Horizontal logo with minimal geometric mark and Open Agent SDK wordmark for dark backgrounds.</desc>
 
   <defs>
     <linearGradient id="markBgDark" x1="40" y1="40" x2="280" y2="280" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#0F172A"/>
       <stop offset="1" stop-color="#1E293B"/>
     </linearGradient>
-    <linearGradient id="signalDark" x1="92" y1="92" x2="228" y2="228" gradientUnits="userSpaceOnUse">
+    <linearGradient id="markStrokeDark" x1="96" y1="96" x2="224" y2="224" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#67E8F9"/>
       <stop offset="1" stop-color="#6EE7B7"/>
-    </linearGradient>
-    <linearGradient id="sparkDark" x1="86" y1="224" x2="112" y2="250" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FBBF24"/>
-      <stop offset="1" stop-color="#FB923C"/>
     </linearGradient>
   </defs>
 
   <rect x="40" y="40" width="240" height="240" rx="58" fill="url(#markBgDark)"/>
 
-  <circle cx="160" cy="160" r="78" stroke="#CBD5E1" stroke-opacity="0.22" stroke-width="3"/>
-
-  <path d="M160 104L104 200H216L160 104Z" stroke="url(#signalDark)" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M160 152L160 104" stroke="url(#signalDark)" stroke-width="8" stroke-linecap="round"/>
-
-  <circle cx="160" cy="104" r="12" fill="#67E8F9"/>
-  <circle cx="104" cy="200" r="11" fill="url(#sparkDark)"/>
-  <circle cx="216" cy="200" r="11" fill="#6EE7B7"/>
-  <circle cx="160" cy="152" r="9" fill="#E2E8F0"/>
+  <rect x="92" y="92" width="136" height="136" rx="36" stroke="url(#markStrokeDark)" stroke-width="12"/>
+  <path d="M126 160H194" stroke="url(#markStrokeDark)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M160 126V194" stroke="url(#markStrokeDark)" stroke-width="12" stroke-linecap="round"/>
 
   <text x="330" y="146" font-size="72" font-family="'Sora', 'Avenir Next', 'Segoe UI', sans-serif" font-weight="700" fill="#F8FAFC" letter-spacing="-1.2">Open Agent SDK</text>
   <text x="334" y="198" font-size="28" font-family="'Sora', 'Avenir Next', 'Segoe UI', sans-serif" font-weight="500" fill="#CBD5E1" letter-spacing="0.4">Open, extensible SDK for AI agents</text>
