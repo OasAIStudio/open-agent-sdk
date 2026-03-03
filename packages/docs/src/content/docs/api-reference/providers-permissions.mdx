@@ -1,0 +1,54 @@
+---
+title: Providers & Permissions
+description: Provider selection, auth behavior, and permission control model.
+---
+
+## Provider strategy
+
+Open Agent SDK supports:
+
+- OpenAI
+- Google Gemini
+- Anthropic
+
+Provider can be explicit (`provider`) or auto-detected from `model` in common cases.
+
+## Auth and `baseURL`
+
+- Default auth: API key from options or provider-specific env var
+- `baseURL` supports compatible endpoints and proxies
+- Anthropic-compatible endpoints may switch auth behavior automatically where needed
+
+## Permission modes
+
+`PermissionMode`:
+
+- `default`
+- `acceptEdits`
+- `bypassPermissions`
+- `plan`
+
+`bypassPermissions` requires `allowDangerouslySkipPermissions: true`.
+
+## Custom permission callback
+
+```ts
+import type { CanUseTool } from 'open-agent-sdk';
+
+const canUseTool: CanUseTool = async (toolName, input) => {
+  if (toolName === 'Bash') {
+    return {
+      behavior: 'deny',
+      message: 'Bash is disabled in this runtime.',
+      interrupt: false,
+    };
+  }
+
+  return {
+    behavior: 'allow',
+    updatedInput: input,
+  };
+};
+```
+
+Attach it via `prompt({ canUseTool })` or `createSession({ canUseTool })`.

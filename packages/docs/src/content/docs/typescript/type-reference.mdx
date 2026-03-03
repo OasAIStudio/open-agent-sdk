@@ -1,0 +1,70 @@
+---
+title: Type Reference
+description: Core TypeScript types exported by open-agent-sdk.
+---
+
+## Frequently used types
+
+```ts
+import type {
+  PromptOptions,
+  PromptResult,
+  Session,
+  CreateSessionOptions,
+  ResumeSessionOptions,
+  ForkSessionOptions,
+  PermissionMode,
+  CanUseTool,
+  OutputFormat,
+  Tool,
+  ToolDefinition,
+  SDKMessage,
+} from 'open-agent-sdk';
+```
+
+## Tool IO types
+
+Built-in tool IO types are exported directly, for example:
+
+- `ReadInput`, `ReadOutput`
+- `WriteInput`, `WriteOutput`
+- `EditInput`, `EditOutput`
+- `BashInput`, `BashOutput`
+- `WebSearchInput`, `WebSearchOutput`
+- `WebFetchInput`, `WebFetchOutput`
+
+## Session/storage types
+
+- `SessionStorage`
+- `SessionData`
+- `FileStorageOptions`
+- `InMemoryStorage`
+- `FileStorage`
+
+## Hooks and events
+
+You can strongly type lifecycle hook integrations via:
+
+- `HookEvent`
+- `HookInput`
+- `HookCallback`
+- `SessionStartHookInput`
+- `PostToolUseHookInput`
+- `PermissionRequestHookInput`
+
+## Structured output types
+
+```ts
+import { Schema, type OutputFormat } from 'open-agent-sdk';
+
+const outputFormat: OutputFormat = {
+  name: 'summary',
+  description: 'Structured summary',
+  schema: Schema.object({
+    title: Schema.string(),
+    bullets: Schema.array(Schema.string()),
+  }),
+};
+```
+
+Use these types to keep API boundaries explicit and avoid `any` in agent pipelines.

@@ -34,28 +34,25 @@ export default defineConfig({
           ]
         },
         {
-          label: 'Core Concepts',
-          items: [{ label: 'ReAct Loop', link: '/core-concepts/react-loop/' }]
-        },
-        {
-          label: 'Providers',
-          items: [{ label: 'Overview', link: '/providers/overview/' }]
-        },
-        {
-          label: 'Tools',
-          items: [{ label: 'Overview', link: '/tools/overview/' }]
-        },
-        {
-          label: 'Sessions & Permissions',
-          items: [{ label: 'Overview', link: '/sessions-permissions/overview/' }]
-        },
-        {
-          label: 'Examples',
-          items: [{ label: 'Overview', link: '/examples/overview/' }]
-        },
-        {
           label: 'API Reference',
-          items: [{ label: 'Overview', link: '/api-reference/overview/' }]
+          items: [
+            { label: 'Overview', link: '/api-reference/overview/' },
+            { label: 'Prompt & Session API', link: '/api-reference/prompt-and-session/' },
+            { label: 'Providers & Permissions', link: '/api-reference/providers-permissions/' }
+          ]
+        },
+        {
+          label: 'TypeScript',
+          items: [
+            { label: 'Type Reference', link: '/typescript/type-reference/' }
+          ]
+        },
+        {
+          label: 'Migration',
+          items: [
+            { label: 'Diff vs Claude Agent SDK', link: '/migration/claude-agent-sdk-diff/' },
+            { label: 'Quick Migration Guide', link: '/migration/quick-migration/' }
+          ]
         }
       ]
     })

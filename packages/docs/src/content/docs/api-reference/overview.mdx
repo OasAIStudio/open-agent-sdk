@@ -1,12 +1,47 @@
 ---
-title: API Reference
-description: API documentation status and entry points.
+title: API Overview
+description: Core exports and recommended entry points.
 ---
 
-This docs site currently provides API reference entry points.
+## Primary entry points
 
-For detailed API material during this migration phase, use:
+The package exposes two primary usage styles:
 
-- Repository docs: `docs/api-reference.md`
+1. `prompt()` for one-shot requests
+2. `createSession()` / `resumeSession()` / `forkSession()` for stateful workflows
 
-A fully integrated API reference section will be added in a follow-up iteration.
+```ts
+import { prompt, createSession, resumeSession, forkSession } from 'open-agent-sdk';
+```
+
+## One-shot API
+
+`prompt(input, options)` returns:
+
+- `result: string`
+- `duration_ms: number`
+- `usage: { input_tokens; output_tokens }`
+- `session_id?: string`
+- `structured_output?: unknown`
+
+## Session API
+
+Session lifecycle:
+
+- `await session.send(message)`
+- `for await (const event of session.stream()) { ... }`
+- `session.getMessages()` for history
+- `await session.close()`
+
+## Other important exports
+
+- Providers: `OpenAIProvider`, `GoogleProvider`, `AnthropicProvider`
+- Permissions: `PermissionManager`, `PermissionMode`, `CanUseTool`
+- Tools: built-in tool classes and input/output types
+- Hooks: `HookManager` and typed hook payloads
+- Output format: `OutputFormat`, `Schema`
+
+For detailed signatures and examples, continue with:
+
+- [Prompt & Session API](/api-reference/prompt-and-session/)
+- [Providers & Permissions](/api-reference/providers-permissions/)
