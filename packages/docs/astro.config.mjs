@@ -36,10 +36,7 @@ export default defineConfig({
         {
           label: 'API Reference',
           items: [
-            { label: 'Overview', link: '/api-reference/overview/' },
-            { label: 'Prompt & Session API', link: '/api-reference/prompt-and-session/' },
-            { label: 'Providers & Permissions', link: '/api-reference/providers-permissions/' },
-            { label: 'Type Reference', link: '/api-reference/type-reference/' }
+            { label: 'API Reference', link: '/api-reference/overview/' }
           ]
         },
         {
