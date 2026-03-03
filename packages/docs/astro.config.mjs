@@ -38,13 +38,8 @@ export default defineConfig({
           items: [
             { label: 'Overview', link: '/api-reference/overview/' },
             { label: 'Prompt & Session API', link: '/api-reference/prompt-and-session/' },
-            { label: 'Providers & Permissions', link: '/api-reference/providers-permissions/' }
-          ]
-        },
-        {
-          label: 'TypeScript',
-          items: [
-            { label: 'Type Reference', link: '/typescript/type-reference/' }
+            { label: 'Providers & Permissions', link: '/api-reference/providers-permissions/' },
+            { label: 'Type Reference', link: '/api-reference/type-reference/' }
           ]
         },
         {
