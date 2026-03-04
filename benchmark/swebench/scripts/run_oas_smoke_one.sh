@@ -114,13 +114,26 @@ if [[ -n "${SWEBENCH_TIMEOUT:-}" ]]; then
 else
   echo "Using harness default timeout (SWEBENCH_TIMEOUT is unset)"
 fi
+set +e
 "${RUN_EVAL_CMD[@]}"
+RUN_EVAL_EXIT_CODE=$?
+set -e
 
 REPORT_BASENAME="${OAS_MODEL}.${RUN_ID}.json"
 if [[ -f "${SWEBENCH_DIR}/${REPORT_BASENAME}" ]]; then
   mv "${SWEBENCH_DIR}/${REPORT_BASENAME}" "${REPORT_DIR}/${REPORT_BASENAME}"
 elif [[ -f "${REPO_ROOT}/${REPORT_BASENAME}" ]]; then
   mv "${REPO_ROOT}/${REPORT_BASENAME}" "${REPORT_DIR}/${REPORT_BASENAME}"
+fi
+
+if [[ "${RUN_EVAL_EXIT_CODE}" -ne 0 ]]; then
+  echo "Harness exited non-zero: ${RUN_EVAL_EXIT_CODE}" >&2
+  echo "run_id=${RUN_ID}"
+  echo "predictions=${PRED_FILE}"
+  echo "reports=${REPORT_DIR}"
+  echo "trajectories=${TRAJ_DIR}"
+  echo "logs=${LOG_DIR}"
+  exit "${RUN_EVAL_EXIT_CODE}"
 fi
 
 echo "[3/3] Done"
