@@ -109,6 +109,19 @@ export default function HomePage() {
           choose providers and extensions as your product evolves.
         </p>
       </section>
+
+      <footer className="site-footer" aria-label="Site footer">
+        <p>
+          Built by{' '}
+          <a href="https://oasai.studio" target="_blank" rel="noreferrer">
+            OasAI Studio
+          </a>{' '}
+          · Open-source under MIT ·{' '}
+          <a href={githubUrl} target="_blank" rel="noreferrer">
+            View on GitHub
+          </a>
+        </p>
+      </footer>
     </main>
   );
 }

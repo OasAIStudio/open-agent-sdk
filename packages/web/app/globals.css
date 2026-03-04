@@ -238,6 +238,28 @@ a {
   max-width: 760px;
 }
 
+.site-footer {
+  margin-top: 12px;
+  padding: 14px 4px 0;
+}
+
+.site-footer p {
+  margin: 0;
+  color: #99a8cd;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.site-footer a {
+  color: var(--text-1);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--text-0);
+  text-decoration: underline;
+}
+
 .page {
   width: min(860px, 92vw);
   margin: 0 auto;
