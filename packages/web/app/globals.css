@@ -229,6 +229,97 @@ a {
   line-height: 1.55;
 }
 
+.segment-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.segment-card {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(11, 16, 29, 0.92), rgba(8, 12, 22, 0.88));
+  padding: 18px;
+}
+
+.segment-label {
+  margin: 0;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.segment-card h3 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.segment-card p {
+  margin: 8px 0 0;
+  color: var(--text-1);
+  line-height: 1.5;
+}
+
+.segment-card a {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.objection-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.objection-grid article {
+  border: 1px solid var(--line);
+  background: rgba(9, 14, 27, 0.6);
+  padding: 18px;
+}
+
+.objection-grid h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.objection-grid p {
+  margin: 8px 0 0;
+  color: var(--text-1);
+  line-height: 1.55;
+}
+
+.final-cta {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  padding: 28px;
+  background:
+    radial-gradient(540px 220px at 88% -20%, rgba(132, 169, 255, 0.22), transparent 70%),
+    rgba(7, 11, 21, 0.92);
+}
+
+.final-cta h2 {
+  margin: 0;
+  font-size: clamp(28px, 4.2vw, 42px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.final-cta p {
+  margin: 10px 0 0;
+  color: var(--text-1);
+  font-size: 18px;
+  line-height: 1.55;
+  max-width: 760px;
+}
+
 .page {
   width: min(860px, 92vw);
   margin: 0 auto;
@@ -293,6 +384,15 @@ time {
 
   .value-grid {
     grid-template-columns: 1fr;
+  }
+
+  .segment-grid,
+  .objection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .final-cta {
+    padding: 22px;
   }
 
   .hero {

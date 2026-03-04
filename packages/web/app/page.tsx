@@ -3,6 +3,9 @@ import Link from 'next/link';
 const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL ?? '/docs';
 const githubUrl = 'https://github.com/OasAIStudio/open-agent-sdk';
 const npmUrl = 'https://www.npmjs.com/package/open-agent-sdk';
+const docsQuickstartUrl = `${docsUrl}/getting-started/quickstart/`;
+const docsMigrationUrl = `${docsUrl}/migration/quick-migration/`;
+const docsApiUrl = `${docsUrl}/api-reference/overview/`;
 
 const navItems = [
   { href: docsUrl, label: 'Docs' },
@@ -104,6 +107,67 @@ export default function HomePage() {
             surface designed for long-term maintainability.
           </p>
         </article>
+      </section>
+
+      <section className="segment-grid" aria-label="Choose your path">
+        <article className="segment-card">
+          <p className="segment-label">Path 1</p>
+          <h3>New to agent runtimes</h3>
+          <p>Start with quickstart and ship your first tool-enabled workflow today.</p>
+          <a href={docsQuickstartUrl}>Open quickstart</a>
+        </article>
+        <article className="segment-card">
+          <p className="segment-label">Path 2</p>
+          <h3>Migrating from Claude Agent SDK</h3>
+          <p>Map concepts and move existing flows with minimal API friction.</p>
+          <a href={docsMigrationUrl}>See migration guide</a>
+        </article>
+        <article className="segment-card">
+          <p className="segment-label">Path 3</p>
+          <h3>Evaluating for production</h3>
+          <p>Review API surface, control primitives, and extension points.</p>
+          <a href={docsApiUrl}>Browse API reference</a>
+        </article>
+      </section>
+
+      <section className="objection-grid" aria-label="Common objections">
+        <article>
+          <h3>Why not just use Claude Agent SDK directly?</h3>
+          <p>
+            Use Open Agent SDK when you want Claude-style APIs plus multi-provider and
+            plugin-style extensibility in one open-source runtime.
+          </p>
+        </article>
+        <article>
+          <h3>Is this too heavy for our team?</h3>
+          <p>
+            Start with one-shot prompts, then add sessions, permissions, and tools as
+            your workflows mature.
+          </p>
+        </article>
+        <article>
+          <h3>What if requirements change later?</h3>
+          <p>
+            The core is MIT-licensed and TypeScript-first, so you can customize,
+            audit, and evolve without black-box constraints.
+          </p>
+        </article>
+      </section>
+
+      <section className="final-cta" aria-label="Final call to action">
+        <h2>Build now. Migrate safely. Stay open.</h2>
+        <p>
+          Ship with Claude Agent SDK-style APIs while keeping the flexibility to
+          choose providers and extensions as your product evolves.
+        </p>
+        <div className="hero-cta">
+          <Link className="btn btn-primary" href={docsUrl}>
+            Start with the docs
+          </Link>
+          <a className="btn btn-secondary" href={githubUrl} target="_blank" rel="noreferrer">
+            Star on GitHub
+          </a>
+        </div>
       </section>
     </main>
   );
