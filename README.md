@@ -3,7 +3,7 @@
 
   <h1>Open Agent SDK</h1>
 
-  <p><strong>TypeScript SDK for building production-grade AI agents with tool use and multi-provider support.</strong></p>
+  <p><strong>Minimal, production-ready agent loop with tool system, hooks, skills, subagents.</strong></p>
 
   <p>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License: MIT"></a>
