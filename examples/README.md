@@ -4,7 +4,7 @@ This directory contains example scripts and demonstrations of the Open Agent SDK
 
 ## Quick Start Example
 
-See [`quickstart.ts`](./quickstart.ts) for a comprehensive introduction to the SDK.
+See [`quickstart/`](./quickstart/) for a comprehensive introduction to the SDK.
 
 ```bash
 # Set your API key
@@ -12,8 +12,10 @@ export OPENAI_API_KEY="your-api-key"
 # or
 export GEMINI_API_KEY="your-api-key"
 
-# Run the example
-bun run examples/quickstart.ts
+# Run quickstart suite
+cd examples/quickstart
+bun install
+bun test
 ```
 
 ## Skill System Demo
@@ -82,7 +84,7 @@ Use $ARGUMENTS to reference what the user typed after /skill-name.
 
 | Example | Description |
 |---------|-------------|
-| `quickstart.ts` | Comprehensive SDK overview |
+| `quickstart/` | Comprehensive SDK quickstart package |
 | `skills-demo.ts` | Skill system demonstration |
 | `skills/` | Example skill files |
 
