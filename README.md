@@ -3,7 +3,7 @@
 
   <h1>Open Agent SDK</h1>
 
-  <p><strong>TypeScript SDK for building production-grade AI agents with tool use and multi-provider support.</strong></p>
+  <p><strong>Minimal, production-ready TypeScript SDK for building tool-using AI agents.</strong></p>
 
   <p>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License: MIT"></a>
@@ -12,103 +12,96 @@
   </p>
 </div>
 
-- Compatible developer experience with Claude Agent SDK concepts
-- Open and extensible architecture for custom tools, providers, and hooks
-- Strong operational controls with sessions, permissions, and MCP integration
+Build agents with a ReAct loop, tool permissions, hooks, subagents, session persistence, and multi-provider support.
 
-## Highlights
+## 1-Minute Quickstart
+
+```bash
+npx open-agent-sdk@alpha init my-agent
+cd my-agent
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Or with Bun:
+
+```bash
+bunx open-agent-sdk@alpha init my-agent
+```
+
+## 30-Second Demo
 
 <div align="center">
   <img src="./docs/branding/pixel-demo.svg" alt="Open Agent SDK Demo" width="100%">
 </div>
 
-- ReAct-style agent loop with multi-turn execution
-- Built-in toolset for files, shell, search, web, and task orchestration
-- Session persistence with resume and fork support
-- Permission system (`default`, `acceptEdits`, `bypassPermissions`, `plan`)
-- Hook system for lifecycle and tool events
-- Multi-provider support (OpenAI, Google Gemini, Anthropic)
-- MCP integration support
-- Strict TypeScript typing across public APIs
+More runnable demos: [Demo Gallery](./DEMO_GALLERY.md).
 
-## Installation
+## Why Open Agent SDK
 
-```bash
-npm install open-agent-sdk@alpha
-```
+- Production safety controls: permission modes (`default`, `plan`, `acceptEdits`, `bypassPermissions`) and per-tool gating via `canUseTool`.
+- Agent extensibility core: hooks, skills, subagents, and MCP-compatible tool integration.
+- Reproducible evaluation path: local SWE-bench and Terminal-bench harnesses in `benchmark/`.
 
-Alternative package managers:
+See details in:
+- [API Reference](./docs/api-reference.md)
+- [SWE-bench Guide](./benchmark/swebench/README.md)
+- [Terminal-bench Guide](./benchmark/terminalbench/README.md)
+- [Benchmarks](./BENCHMARKS.md)
 
-```bash
-yarn add open-agent-sdk@alpha
-pnpm add open-agent-sdk@alpha
-bun add open-agent-sdk@alpha
-```
+## Concepts
 
-## Requirements
+- `Agent loop`: multi-turn ReAct with tool execution.
+- `Tool permissions`: explicit allow/deny policy hooks.
+- `Hooks`: lifecycle/tool events for observability and control.
+- `Subagents`: task delegation and orchestration.
+- `Sessions`: create, save, resume, and fork conversations.
 
-- Bun `>= 1.0.0`
-- Node.js `>= 18`
-- TypeScript `>= 5.0`
+## Example Gallery
 
-## Quick Start
+- [Interactive Code Agent CLI](./examples/code-agent/README.md)
+- [Quickstart Tests (basic/session/tools)](./examples/quickstart/README.md)
+- [Skill System Demo](./examples/README.md#skill-system-demo)
+- [Structured Output Demo](./examples/structured-output-demo.ts)
+- [File Checkpoint Demo](./examples/file-checkpoint-demo.ts)
 
-### One-shot prompt
+## Evaluation
 
-```typescript
-import { prompt } from "open-agent-sdk";
+- SWE-bench Lite smoke/batch runners: `benchmark/swebench/scripts/`
+- Terminal-bench Harbor adapter and runbook: `benchmark/terminalbench/`
+- Result summarization scripts and artifacts: see [BENCHMARKS.md](./BENCHMARKS.md)
 
-const result = await prompt("Summarize the repository structure.", {
-  model: "gpt-5.3-codex",
-  provider: "openai",
-  apiKey: process.env.OPENAI_API_KEY,
-});
+## Integrations
 
-console.log(result.result);
-console.log(result.usage);
-```
+Current provider support in core SDK:
 
-### Session workflow
+- OpenAI
+- Google Gemini
+- Anthropic
 
-```typescript
-import { createSession } from "open-agent-sdk";
+Ecosystem integrations:
 
-const session = await createSession({
-  model: "gpt-5.3-codex",
-  provider: "openai",
-  apiKey: process.env.OPENAI_API_KEY,
-});
+- MCP server integration support
+- Harbor adapter for Terminal-bench
 
-await session.send("Read the current directory and list key files.");
-
-for await (const message of session.stream()) {
-  if (message.type === "assistant") {
-    console.log(message.message.content);
-  }
-}
-
-session.close();
-```
-
-## Documentation
+## Docs
 
 - Homepage: https://openagentsdk.dev
 - Docs: https://docs.openagentsdk.dev
 - GitHub: https://github.com/OasAIStudio/open-agent-sdk
-- [API Reference](./docs/api-reference.md)
 - [Introduction](./docs/introduction.md)
 - [Comparison with Claude Agent SDK](./docs/claude-agent-sdk-comparison.md)
-- Docs site (Astro + Starlight): `packages/docs` (`bun run docs:dev`)
-- Product web (Next.js): `packages/web` (`bun run web:dev`)
 
-## Monorepo Structure
+## Monorepo Layout
 
 ```text
 packages/
   core/        # SDK implementation
   web/         # product homepage (Next.js)
-  docs/        # documentation site (Astro + Starlight)
-examples/      # usage examples
+  docs/        # docs site (Astro + Starlight)
+examples/      # runnable examples
+benchmark/     # eval harness and scripts
 docs/          # engineering docs, workflows, ADRs
 ```
 
@@ -141,7 +134,7 @@ env $(cat .env | xargs) bun test
 
 Current release line: `0.1.0-alpha.x`.
 
-This repository is under active development. APIs may evolve before the stable `1.0.0` release.
+The repository is under active development. APIs may evolve before stable `1.0.0`.
 
 ## Contributing
 

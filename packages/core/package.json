@@ -4,8 +4,13 @@
   "description": "Open source agent SDK compatible with Claude Agent SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "open-agent-sdk": "./bin/open-agent-sdk.js",
+    "oas": "./bin/open-agent-sdk.js"
+  },
   "files": [
-    "dist"
+    "dist",
+    "bin"
   ],
   "scripts": {
     "build": "tsc",
