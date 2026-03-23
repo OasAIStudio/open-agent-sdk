@@ -24,17 +24,17 @@ Usage:
       --model claude-sonnet-4 \
       --ae ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
 
-    # Codex (via API key)
+    # Codex / GPT-5.4 (via OAuth credentials JSON)
     harbor run -d terminal-bench@2.0 \
       --agent-import-path "harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent" \
-      --model codex-mini \
-      --ae OAS_CODEX_API_KEY=$OAS_CODEX_API_KEY
-
-    # Codex (via OAuth credentials JSON)
-    harbor run -d terminal-bench@2.0 \
-      --agent-import-path "harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent" \
-      --model codex-mini \
+      --model gpt-5.4 \
       --ae OAS_CODEX_OAUTH_JSON='{"access":"...","refresh":"...","expires":...}'
+
+    # Codex / GPT-5.4 (via API key)
+    harbor run -d terminal-bench@2.0 \
+      --agent-import-path "harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent" \
+      --model gpt-5.4 \
+      --ae OAS_CODEX_API_KEY=$OAS_CODEX_API_KEY
 
 Note: Environment variables MUST be passed via --ae flag for Docker container access.
 """
@@ -56,8 +56,17 @@ def is_minimax_model(model_name: str) -> bool:
 
 
 def is_codex_model(model_name: str) -> bool:
-    """Check if the model is a Codex model."""
-    return model_name.lower().startswith("codex")
+    """Check if the model should use the Codex provider.
+
+    Returns True if:
+    - Model name starts with 'codex', OR
+    - Codex auth credentials are available via env vars (OAS_CODEX_API_KEY or OAS_CODEX_OAUTH_JSON),
+      which indicates the user wants to use the Codex/ChatGPT backend for this model.
+    """
+    if model_name.lower().startswith("codex"):
+        return True
+    # If codex auth is explicitly provided, treat any model as codex
+    return bool(os.environ.get("OAS_CODEX_API_KEY") or os.environ.get("OAS_CODEX_OAUTH_JSON"))
 
 
 def get_required_env_var_names(model_name: str) -> list[str]:

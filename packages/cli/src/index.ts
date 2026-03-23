@@ -84,7 +84,7 @@ async function main() {
       permissionMode: 'bypassPermissions',
       allowDangerouslySkipPermissions: true,
       cwd,
-      baseURL,
+      ...(provider !== 'codex' && provider !== 'openai-codex' && baseURL ? { baseURL } : {}),
       logLevel: 'error',
       storage,
     });
