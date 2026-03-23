@@ -109,6 +109,16 @@ describe('Session Unit Tests', () => {
       await session.close();
     });
 
+    it('should create a codex session without requiring an API key', async () => {
+      const session = await createSession({
+        model: 'gpt-5.4',
+        provider: 'codex',
+      });
+
+      expect(session.provider).toBe('codex');
+      await session.close();
+    });
+
     it('should throw if API key not provided', async () => {
       const originalOpenAIKey = process.env.OPENAI_API_KEY;
       const originalGeminiKey = process.env.GEMINI_API_KEY;

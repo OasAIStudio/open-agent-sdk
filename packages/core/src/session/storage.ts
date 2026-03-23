@@ -10,6 +10,7 @@ import type { SDKMessage } from '../types/messages';
 import type { PermissionMode } from '../permissions/types';
 import type { HooksConfig } from '../hooks/types';
 import type { OutputFormat } from '../types/output-format';
+import type { CodexOAuthOptions } from '../auth/codex';
 
 /** Session data structure for storage */
 export interface SessionData {
@@ -43,6 +44,10 @@ export interface SessionOptions {
   provider?: string;
   /** API key (optional, can use env var) */
   apiKey?: string;
+  /** Base URL override (optional) */
+  baseURL?: string;
+  /** Codex OAuth configuration (optional) */
+  codexOAuth?: CodexOAuthOptions;
   /** Maximum number of turns (optional) */
   maxTurns?: number;
   /** Allowed tool names (optional, defaults to all) */

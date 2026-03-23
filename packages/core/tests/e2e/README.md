@@ -1,6 +1,6 @@
 # Open Agent SDK - E2E Integration Tests
 
-This directory contains comprehensive end-to-end tests using real API connections to OpenAI and Google Gemini. These tests verify the SDK works correctly in real-world scenarios.
+This directory contains comprehensive end-to-end tests using real API connections to OpenAI, Codex, and Google Gemini. These tests verify the SDK works correctly in real-world scenarios.
 
 ## Prerequisites
 
@@ -16,6 +16,10 @@ export OPENAI_MODEL=gpt-4o-mini  # optional, defaults to gpt-4o-mini
 # Google Gemini (optional)
 export GEMINI_API_KEY=AIza...
 export GEMINI_MODEL=gemini-2.0-flash  # optional, defaults to gemini-2.0-flash
+
+# Codex OAuth (optional)
+codex login
+export CODEX_MODEL=gpt-5.4  # optional, defaults to gpt-5.4
 ```
 
 ### Using Gemini with OpenAI-Compatible API
@@ -61,6 +65,9 @@ OPENAI_API_KEY=xxx bun test tests/e2e/providers/openai.test.ts
 
 # Google only
 GEMINI_API_KEY=xxx bun test tests/e2e/providers/google.test.ts
+
+# Codex only
+bun test tests/e2e/providers/codex.test.ts
 ```
 
 ### Run Specific Feature Tests
@@ -95,6 +102,7 @@ tests/e2e/
 ├── setup.ts                      # Test configuration and utilities
 ├── providers/
 │   ├── openai.test.ts            # OpenAI Provider tests
+│   ├── codex.test.ts             # Codex OAuth provider smoke test
 │   └── google.test.ts            # Google Gemini Provider tests
 └── features/
     ├── prompt.test.ts            # prompt() function tests

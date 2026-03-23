@@ -19,7 +19,7 @@ import type { CreateSessionOptions } from '../../src/session/factory';
  * 2. Tests might inherit shell environment variables (e.g., Claude Code's ANTHROPIC_BASE_URL)
  * 3. We need .env values to take precedence over shell values
  */
-function loadEnvFile(): string {
+function loadEnvFile(): string | null {
   // Possible .env locations (in priority order)
   const possiblePaths = [
     join(process.cwd(), '.env'),                    // Current directory (main repo or symlink)
@@ -56,12 +56,11 @@ function loadEnvFile(): string {
     }
   }
 
-  // If no .env found, throw clear error
-  throw new Error(
-    'Cannot find .env file. Searched in:\n' +
-    possiblePaths.map(p => `  - ${p}`).join('\n') +
-    '\n\nFor worktree: create symlink with: ln -s ../../.env .env'
+  console.log(
+    '[Test Setup] No .env file found. Continuing with current process environment only.\n' +
+    possiblePaths.map(p => `  - ${p}`).join('\n')
   );
+  return null;
 }
 
 // Load .env before any test configuration
@@ -90,6 +89,16 @@ export const TEST_CONFIG = {
     model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
     available: !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN),
   },
+  // Codex OAuth settings
+  codex: {
+    authPath: process.env.OAS_CODEX_AUTH_PATH ||
+      `${process.env.CODEX_HOME || `${process.env.HOME || process.env.USERPROFILE || '.'}/.codex`}/auth.json`,
+    model: process.env.CODEX_MODEL || process.env.OAS_MODEL || 'gpt-5.4',
+    available: existsSync(
+      process.env.OAS_CODEX_AUTH_PATH ||
+      `${process.env.CODEX_HOME || `${process.env.HOME || process.env.USERPROFILE || '.'}/.codex`}/auth.json`
+    ),
+  },
   // Test control
   skipExpensive: process.env.E2E_SKIP_EXPENSIVE === 'true',
   timeout: parseInt(process.env.E2E_TIMEOUT || '30000', 10),
@@ -99,7 +108,7 @@ export const TEST_CONFIG = {
  * Check if a provider is available for testing
  * For OpenAI, checks either OPENAI_API_KEY or GEMINI_API_KEY (when using OpenAI-compatible endpoint)
  */
-export function isProviderAvailable(provider: 'openai' | 'google' | 'anthropic'): boolean {
+export function isProviderAvailable(provider: 'openai' | 'google' | 'anthropic' | 'codex'): boolean {
   if (provider === 'openai') {
     // OpenAI is available if:
     // 1. OPENAI_API_KEY is set, OR
@@ -114,7 +123,7 @@ export function isProviderAvailable(provider: 'openai' | 'google' | 'anthropic')
  * Check if provider is available, return boolean
  * Use at the beginning of test: if (skipIfNoProvider('openai')) return;
  */
-export function skipIfNoProvider(provider: 'openai' | 'google' | 'anthropic'): boolean {
+export function skipIfNoProvider(provider: 'openai' | 'google' | 'anthropic' | 'codex'): boolean {
   const available = isProviderAvailable(provider);
   if (!available) {
     console.log(`Skipping test: ${provider} API key not available`);
@@ -126,9 +135,20 @@ export function skipIfNoProvider(provider: 'openai' | 'google' | 'anthropic'): b
  * Get test options for prompt() with specified provider
  */
 export function getPromptOptions(
-  provider: 'openai' | 'google' | 'anthropic',
+  provider: 'openai' | 'google' | 'anthropic' | 'codex',
   overrides: Partial<PromptOptions> = {}
 ): PromptOptions {
+  if (provider === 'codex') {
+    return {
+      model: TEST_CONFIG.codex.model,
+      provider: 'codex',
+      codexOAuth: {
+        codexAuthPath: TEST_CONFIG.codex.authPath,
+      },
+      ...overrides,
+    };
+  }
+
   const config = TEST_CONFIG[provider];
 
   // For OpenAI provider, if using Gemini's OpenAI-compatible endpoint, use GEMINI_API_KEY
@@ -150,9 +170,20 @@ export function getPromptOptions(
  * Get test options for createSession() with specified provider
  */
 export function getSessionOptions(
-  provider: 'openai' | 'google' | 'anthropic',
+  provider: 'openai' | 'google' | 'anthropic' | 'codex',
   overrides: Partial<CreateSessionOptions> = {}
 ): CreateSessionOptions {
+  if (provider === 'codex') {
+    return {
+      model: TEST_CONFIG.codex.model,
+      provider: 'codex',
+      codexOAuth: {
+        codexAuthPath: TEST_CONFIG.codex.authPath,
+      },
+      ...overrides,
+    };
+  }
+
   const config = TEST_CONFIG[provider];
 
   // For OpenAI provider, if using Gemini's OpenAI-compatible endpoint, use GEMINI_API_KEY

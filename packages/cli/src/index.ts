@@ -26,18 +26,23 @@ function resolveCleanupBackgroundMode(): CleanupBackgroundMode {
 
 const instruction = getFlag('-p');
 const model = getFlag('--model') ?? process.env.OAS_MODEL;
-const provider = getFlag('--provider') as 'openai' | 'google' | 'anthropic' | undefined;
+const provider = (getFlag('--provider') ?? process.env.OAS_PROVIDER) as
+  'openai' | 'google' | 'anthropic' | 'codex' | 'openai-codex' | undefined;
 const outputFormat = getFlag('--output-format') ?? 'text';
 const maxTurns = parseInt(getFlag('--max-turns') ?? '50', 10);
 const cwd = getFlag('--cwd') ?? process.cwd();
 const baseURL = getFlag('--base-url') ?? process.env.ANTHROPIC_BASE_URL ?? process.env.OPENAI_BASE_URL;
 const saveTrajectory = getFlag('--save-trajectory');
 const sessionDir = getFlag('--session-dir');
+const codexAuthPath = getFlag('--codex-auth-path') ?? process.env.OAS_CODEX_AUTH_PATH;
+const codexCredentialsPath = getFlag('--codex-credentials-path') ?? process.env.OAS_CODEX_CREDENTIALS_PATH;
+const codexInteractiveLogin = args.includes('--codex-interactive-login') ||
+  process.env.OAS_CODEX_INTERACTIVE_LOGIN === 'true';
 const noPersist = args.includes('--no-persist');
 const cleanupBackgroundMode = resolveCleanupBackgroundMode();
 
 if (!instruction) {
-  console.error('Usage: oas -p <instruction> [--model <model>] [--provider openai|google|anthropic] [--output-format text|json] [--max-turns <n>] [--cwd <path>] [--save-trajectory <path>] [--session-dir <path>] [--cleanup-background never|on-error|always] [--no-persist]');
+  console.error('Usage: oas -p <instruction> [--model <model>] [--provider openai|google|anthropic|codex] [--output-format text|json] [--max-turns <n>] [--cwd <path>] [--save-trajectory <path>] [--session-dir <path>] [--codex-interactive-login] [--codex-auth-path <path>] [--codex-credentials-path <path>] [--cleanup-background never|on-error|always] [--no-persist]');
   process.exit(1);
 }
 
@@ -76,6 +81,15 @@ async function main() {
       allowDangerouslySkipPermissions: true,
       cwd,
       baseURL,
+      ...(provider === 'codex' || provider === 'openai-codex'
+        ? {
+            codexOAuth: {
+              allowInteractiveLogin: codexInteractiveLogin,
+              ...(codexAuthPath ? { codexAuthPath } : {}),
+              ...(codexCredentialsPath ? { credentialsPath: codexCredentialsPath } : {}),
+            },
+          }
+        : {}),
       logLevel: 'error',
       storage,
     });

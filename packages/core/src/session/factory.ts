@@ -6,6 +6,7 @@
 import { OpenAIProvider } from '../providers/openai';
 import { GoogleProvider } from '../providers/google';
 import { AnthropicProvider } from '../providers/anthropic';
+import { CodexProvider } from '../providers/codex';
 import { createDefaultRegistry } from '../tools/registry';
 
 /**
@@ -36,17 +37,108 @@ import { checkpointManager } from '../tools/file-checkpoint';
 import { createCheckpointHooks } from '../hooks/file-checkpoint-hooks';
 import { HookManager } from '../hooks/manager';
 import type { HooksConfig, HookCallbackMatcher } from '../hooks/types';
+import type { CodexOAuthOptions } from '../auth/codex';
+
+type ProviderType = 'openai' | 'google' | 'anthropic' | 'codex';
+type ProviderOption = ProviderType | 'openai-codex';
+
+function normalizeProvider(provider?: ProviderOption): ProviderType | undefined {
+  if (!provider) {
+    return undefined;
+  }
+
+  return provider === 'openai-codex' ? 'codex' : provider;
+}
+
+function detectProvider(options: {
+  model: string;
+  provider?: ProviderOption;
+  apiKey?: string;
+  codexOAuth?: CodexOAuthOptions;
+}): ProviderType {
+  const normalized = normalizeProvider(options.provider);
+  if (normalized) {
+    return normalized;
+  }
+
+  const modelLower = options.model.toLowerCase();
+  if (modelLower.includes('gemini')) {
+    return 'google';
+  }
+  if (modelLower.includes('claude')) {
+    return 'anthropic';
+  }
+  if (modelLower.includes('codex') && (options.codexOAuth || (!options.apiKey && !process.env.OPENAI_API_KEY))) {
+    return 'codex';
+  }
+  return 'openai';
+}
+
+function resolveApiKey(providerType: ProviderType, apiKey?: string): string | undefined {
+  if (apiKey) {
+    return apiKey;
+  }
+
+  if (providerType === 'google') {
+    return process.env.GEMINI_API_KEY;
+  }
+  if (providerType === 'anthropic') {
+    return process.env.ANTHROPIC_API_KEY;
+  }
+  if (providerType === 'openai') {
+    return process.env.OPENAI_API_KEY;
+  }
+  return undefined;
+}
+
+function createProvider(options: {
+  providerType: ProviderType;
+  apiKey?: string;
+  model: string;
+  baseURL?: string;
+  codexOAuth?: CodexOAuthOptions;
+}) {
+  if (options.providerType === 'google') {
+    return new GoogleProvider({ apiKey: options.apiKey, model: options.model });
+  }
+
+  if (options.providerType === 'anthropic') {
+    const useBearerAuth = requiresBearerAuth(options.baseURL);
+    return new AnthropicProvider({
+      apiKey: useBearerAuth ? undefined : options.apiKey,
+      authToken: useBearerAuth ? options.apiKey : undefined,
+      model: options.model,
+      baseURL: options.baseURL,
+    });
+  }
+
+  if (options.providerType === 'codex') {
+    return new CodexProvider({
+      apiKey: options.apiKey,
+      model: options.model,
+      codexOAuth: options.codexOAuth,
+    });
+  }
+
+  return new OpenAIProvider({
+    apiKey: options.apiKey,
+    model: options.model,
+    baseURL: options.baseURL,
+  });
+}
 
 /** Options for creating a new session */
 export interface CreateSessionOptions {
   /** Model identifier (e.g., 'gpt-4o', 'gemini-2.0-flash') */
   model: string;
-  /** Provider to use: 'openai', 'google', or 'anthropic' (auto-detected from model name if not specified) */
-  provider?: 'openai' | 'google' | 'anthropic';
+  /** Provider to use: 'openai', 'google', 'anthropic', or 'codex' (auto-detected from model name if not specified) */
+  provider?: ProviderOption;
   /** API key (defaults to OPENAI_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY env var based on provider) */
   apiKey?: string;
   /** Base URL override for API endpoint (used for proxies or compatible APIs like MiniMax) */
   baseURL?: string;
+  /** Codex OAuth configuration used when provider is 'codex' or when auto-detection selects it */
+  codexOAuth?: CodexOAuthOptions;
   /** Maximum conversation turns (default: 10) */
   maxTurns?: number;
   /** Allowed tools whitelist (default: all) */
@@ -85,6 +177,8 @@ export interface ResumeSessionOptions {
   storage?: SessionStorage;
   /** API key override (optional) */
   apiKey?: string;
+  /** Codex OAuth configuration override (optional) */
+  codexOAuth?: CodexOAuthOptions;
   /** Log level: 'debug' | 'info' | 'warn' | 'error' | 'silent' (default: 'info') */
   logLevel?: LogLevel;
   /** Permission mode override (optional) */
@@ -101,6 +195,8 @@ export interface ResumeSessionOptions {
 export interface ForkSessionOptions {
   /** API key override (optional) */
   apiKey?: string;
+  /** Codex OAuth configuration override (optional) */
+  codexOAuth?: CodexOAuthOptions;
   /** Storage implementation (defaults to InMemoryStorage) */
   storage?: SessionStorage;
   /** Log level: 'debug' | 'info' | 'warn' | 'error' | 'silent' (default: 'info') */
@@ -108,7 +204,7 @@ export interface ForkSessionOptions {
   /** Model override (optional) */
   model?: string;
   /** Provider override (optional) */
-  provider?: 'openai' | 'google' | 'anthropic';
+  provider?: ProviderOption;
   /** Permission mode override (optional) */
   permissionMode?: PermissionMode;
   /** Required to be true when using bypassPermissions mode (optional) */
@@ -150,17 +246,12 @@ export async function createSession(options: CreateSessionOptions): Promise<Sess
   logger.setLevel(logLevel);
 
   // Auto-detect provider from model name if not specified
-  const modelLower = options.model.toLowerCase();
-  const providerType = options.provider ??
-    (modelLower.includes('gemini') ? 'google' :
-     modelLower.includes('claude') ? 'anthropic' : 'openai');
+  const providerType = detectProvider(options);
 
   // Get API key based on provider
-  const apiKey = options.apiKey ??
-    (providerType === 'google' ? process.env.GEMINI_API_KEY :
-     providerType === 'anthropic' ? process.env.ANTHROPIC_API_KEY : process.env.OPENAI_API_KEY);
+  const apiKey = resolveApiKey(providerType, options.apiKey);
 
-  if (!apiKey) {
+  if (!apiKey && providerType !== 'codex') {
     const keyName = providerType === 'google' ? 'GEMINI_API_KEY' :
                     providerType === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
     throw new Error(
@@ -171,23 +262,13 @@ export async function createSession(options: CreateSessionOptions): Promise<Sess
   // Create storage (default to FileStorage with project-grouped path)
   const storage = options.storage ?? new FileStorage({ cwd: options.cwd ?? process.cwd() });
 
-  // Create provider
-  let provider;
-  if (providerType === 'google') {
-    provider = new GoogleProvider({ apiKey, model: options.model });
-  } else if (providerType === 'anthropic') {
-    // Auto-detect authentication method based on baseURL
-    // For Anthropic-compatible APIs like MiniMax, use Bearer token authentication
-    const useBearerAuth = requiresBearerAuth(options.baseURL);
-    provider = new AnthropicProvider({
-      apiKey: useBearerAuth ? undefined : apiKey,
-      authToken: useBearerAuth ? apiKey : undefined,
-      model: options.model,
-      baseURL: options.baseURL,
-    });
-  } else {
-    provider = new OpenAIProvider({ apiKey, model: options.model, baseURL: options.baseURL });
-  }
+  const provider = createProvider({
+    providerType,
+    apiKey,
+    model: options.model,
+    baseURL: options.baseURL,
+    codexOAuth: options.codexOAuth,
+  });
 
   // Create tool registry with default tools
   const toolRegistry = createDefaultRegistry();
@@ -257,6 +338,7 @@ export async function createSession(options: CreateSessionOptions): Promise<Sess
       model: options.model,
       provider: providerType,
       apiKey: options.apiKey,
+      codexOAuth: options.codexOAuth,
       maxTurns: options.maxTurns,
       allowedTools: options.allowedTools,
       systemPrompt: options.systemPrompt,
@@ -323,13 +405,13 @@ export async function resumeSession(
   }
 
   // Get API key (use override or from options, or env var)
-  const providerType = sessionData.provider as 'openai' | 'google' | 'anthropic';
-  const apiKey = options?.apiKey ??
-    sessionData.options.apiKey ??
-    (providerType === 'google' ? process.env.GEMINI_API_KEY :
-     providerType === 'anthropic' ? process.env.ANTHROPIC_API_KEY : process.env.OPENAI_API_KEY);
+  const providerType = normalizeProvider(sessionData.provider as ProviderOption) ?? 'openai';
+  const apiKey = resolveApiKey(
+    providerType,
+    options?.apiKey ?? sessionData.options.apiKey
+  );
 
-  if (!apiKey) {
+  if (!apiKey && providerType !== 'codex') {
     const keyName = providerType === 'google' ? 'GEMINI_API_KEY' :
                     providerType === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
     throw new Error(
@@ -337,15 +419,13 @@ export async function resumeSession(
     );
   }
 
-  // Create provider
-  let provider;
-  if (providerType === 'google') {
-    provider = new GoogleProvider({ apiKey, model: sessionData.model });
-  } else if (providerType === 'anthropic') {
-    provider = new AnthropicProvider({ apiKey, model: sessionData.model });
-  } else {
-    provider = new OpenAIProvider({ apiKey, model: sessionData.model });
-  }
+  const provider = createProvider({
+    providerType,
+    apiKey,
+    model: sessionData.model,
+    baseURL: sessionData.options.baseURL,
+    codexOAuth: options?.codexOAuth ?? sessionData.options.codexOAuth,
+  });
 
   // Create tool registry with default tools
   const toolRegistry = createDefaultRegistry();
@@ -430,16 +510,16 @@ export async function forkSession(
   }
 
   // Determine provider and model (allow overrides)
-  const providerType = options.provider ?? sourceData.provider as 'openai' | 'google' | 'anthropic';
+  const providerType = normalizeProvider(options.provider ?? sourceData.provider as ProviderOption) ?? 'openai';
   const model = options.model ?? sourceData.model;
 
   // Get API key (use override, saved options, or env var)
-  const apiKey = options.apiKey ??
-    sourceData.options.apiKey ??
-    (providerType === 'google' ? process.env.GEMINI_API_KEY :
-     providerType === 'anthropic' ? process.env.ANTHROPIC_API_KEY : process.env.OPENAI_API_KEY);
+  const apiKey = resolveApiKey(
+    providerType,
+    options.apiKey ?? sourceData.options.apiKey
+  );
 
-  if (!apiKey) {
+  if (!apiKey && providerType !== 'codex') {
     const keyName = providerType === 'google' ? 'GEMINI_API_KEY' :
                     providerType === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
     throw new Error(
@@ -447,15 +527,13 @@ export async function forkSession(
     );
   }
 
-  // Create provider
-  let provider;
-  if (providerType === 'google') {
-    provider = new GoogleProvider({ apiKey, model });
-  } else if (providerType === 'anthropic') {
-    provider = new AnthropicProvider({ apiKey, model });
-  } else {
-    provider = new OpenAIProvider({ apiKey, model });
-  }
+  const provider = createProvider({
+    providerType,
+    apiKey,
+    model,
+    baseURL: sourceData.options.baseURL,
+    codexOAuth: options.codexOAuth ?? sourceData.options.codexOAuth,
+  });
 
   // Create tool registry with default tools
   const toolRegistry = createDefaultRegistry();
@@ -511,6 +589,8 @@ export async function forkSession(
       ...sourceData.options,
       model,
       provider: providerType,
+      apiKey: options.apiKey ?? sourceData.options.apiKey,
+      codexOAuth: options.codexOAuth ?? sourceData.options.codexOAuth,
       permissionMode: options.permissionMode ?? sourceData.options.permissionMode,
       allowDangerouslySkipPermissions: options.allowDangerouslySkipPermissions ?? sourceData.options.allowDangerouslySkipPermissions,
       hooks: options.hooks ?? sourceData.options.hooks,

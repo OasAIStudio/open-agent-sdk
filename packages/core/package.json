@@ -18,12 +18,14 @@
     "test:coverage": "bun test --coverage",
     "test:e2e": "bun test tests/e2e",
     "test:e2e:openai": "bun test tests/e2e/providers/openai.test.ts",
-    "test:e2e:google": "bun test tests/e2e/providers/google.test.ts"
+    "test:e2e:google": "bun test tests/e2e/providers/google.test.ts",
+    "test:e2e:codex": "bun test tests/e2e/providers/codex.test.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.0",
     "@ai-sdk/google": "^3.0.21",
     "@ai-sdk/openai": "^3.0.25",
+    "@mariozechner/pi-ai": "0.60.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@mozilla/readability": "^0.6.0",
     "ai": "^6.0.70",

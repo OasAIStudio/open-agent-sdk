@@ -7,6 +7,7 @@ import { logger, type LogLevel } from './utils/logger';
 import type { PermissionMode, CanUseTool } from './permissions/types';
 import type { McpServersConfig } from './mcp/types';
 import type { OutputFormat } from './types/output-format';
+import type { CodexOAuthOptions } from './auth';
 import { InMemoryStorage, type SessionStorage } from './session/storage';
 import { createSession, resumeSession, forkSession } from './session/factory';
 import type { Session } from './session/session';
@@ -31,10 +32,12 @@ export interface PromptOptions {
   model: string;
   /** API key (defaults to OPENAI_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY env var based on provider) */
   apiKey?: string;
-  /** Provider to use: 'openai', 'google', or 'anthropic' (auto-detected from model name if not specified) */
-  provider?: 'openai' | 'google' | 'anthropic';
+  /** Provider to use: 'openai', 'google', 'anthropic', or 'codex' (auto-detected from model name if not specified) */
+  provider?: 'openai' | 'google' | 'anthropic' | 'codex' | 'openai-codex';
   /** Base URL for API (supports custom endpoints like MiniMax). Authentication method is auto-detected based on the endpoint. */
   baseURL?: string;
+  /** Codex OAuth configuration used when provider is 'codex' or when auto-detection selects it */
+  codexOAuth?: CodexOAuthOptions;
   /** Maximum conversation turns (default: 10) */
   maxTurns?: number;
   /** Allowed tools whitelist (default: all) */
@@ -131,6 +134,7 @@ export async function prompt(
         permissionMode: options.permissionMode,
         allowDangerouslySkipPermissions: options.allowDangerouslySkipPermissions,
         canUseTool: options.canUseTool,
+        codexOAuth: options.codexOAuth,
         hooks: undefined, // Will be loaded from source session
       });
     } else {
@@ -138,6 +142,7 @@ export async function prompt(
       session = await resumeSession(options.resume, {
         storage,
         apiKey: options.apiKey,
+        codexOAuth: options.codexOAuth,
         logLevel,
         permissionMode: options.permissionMode,
         allowDangerouslySkipPermissions: options.allowDangerouslySkipPermissions,
@@ -199,6 +204,7 @@ export async function prompt(
     provider: options.provider,
     apiKey: options.apiKey,
     baseURL: options.baseURL,
+    codexOAuth: options.codexOAuth,
     storage: storage ?? new InMemoryStorage(),
     logLevel,
     maxTurns: options.maxTurns,
@@ -258,6 +264,14 @@ function estimateTokens(text: string): number {
 }
 
 // PromptOptions and PromptResult are already exported as interfaces above
+
+export {
+  OPENAI_CODEX_PROVIDER_ID,
+  loginWithCodexOAuth,
+  resolveCodexOAuthApiKey,
+  type CodexOAuthOptions,
+  type CodexOAuthResolution,
+} from './auth';
 
 // Re-export core types
 export type {
@@ -323,6 +337,7 @@ export { LLMProvider, type LLMChunk, type ProviderConfig, type ChatOptions, type
 export { OpenAIProvider, type OpenAIConfig } from './providers/openai';
 export { GoogleProvider, type GoogleConfig } from './providers/google';
 export { AnthropicProvider, type AnthropicConfig } from './providers/anthropic';
+export { CodexProvider, type CodexConfig } from './providers/codex';
 
 // Re-export tools
 export {
