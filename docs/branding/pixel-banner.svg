@@ -228,7 +228,7 @@
     <rect x="437" y="91" width="5" height="5" fill="#cbd5e1"/>
   </g>
 
-  <text x="40" y="132" class="text-subtitle">An open-source alternative to Claude Agent SDK</text>
+  <text x="40" y="132" class="text-subtitle">First-party CLI, open runtime, embeddable SDK</text>
   <text x="40" y="180" class="text-prompt">></text>
   <text x="80" y="180" class="text-cmd">Initializing Agent Loop...<tspan class="cursor"> █</tspan></text>
 

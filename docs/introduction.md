@@ -4,9 +4,19 @@
 
 ## Overview
 
-Open Agent SDK is an open-source TypeScript framework for building AI agents. It provides a developer experience similar to Claude Agent SDK but with full transparency and no vendor lock-in.
+Open Agent SDK is an open agent runtime for tool-using workflows. It ships with a first-party terminal agent, `oas`, and exposes the same core as a TypeScript SDK when you need to embed, customize, or self-host more of the runtime.
+
+## Primary Surfaces
+
+- **`oas` CLI**: the default entry point for running and benchmarking a complete terminal agent
+- **TypeScript SDK**: the embeddable runtime surface for custom apps, automation, and internal products
 
 ## What Makes It Different?
+
+### 🧭 Product-First Shape
+- Start with a working terminal agent instead of only a low-level library
+- Reuse the same runtime beneath the CLI in your own product surfaces
+- Keep benchmark and product messaging centered on an actual agent surface
 
 ### 🔓 Open Source & Transparent
 - Full source code visibility
@@ -280,10 +290,13 @@ const session = createSession({
 });
 ```
 
-## Comparison with Claude Agent SDK
+## Comparison and Migration Context
+
+Claude Agent SDK is a useful migration reference for this project, but it is not the primary way to understand Open Agent SDK. The main product shape here is `oas` plus an embeddable runtime.
 
 | Feature | Open Agent SDK | Claude Agent SDK |
 |---------|---------------|------------------|
+| Primary Surface | First-party CLI + embeddable runtime | Vendor-maintained SDK |
 | Open Source | ✅ Yes | ❌ No |
 | Multi-Provider | ✅ OpenAI/Gemini/Anthropic | ❌ Anthropic only |
 | Agent Loop | ✅ | ✅ |
@@ -299,12 +312,17 @@ const session = createSession({
 
 ## Getting Started
 
-1. **Installation**
+1. **Choose your entry point**
+   ```bash
+   npx open-agent-sdk@alpha init my-agent
+   ```
+
+2. **Install the SDK when you want to embed the runtime**
    ```bash
    npm install open-agent-sdk@alpha
    ```
 
-2. **Quick Example**
+3. **SDK Example**
    ```bash
    codex login
    ```
@@ -320,7 +338,7 @@ const session = createSession({
    console.log(result.result);
    ```
 
-3. **Next Steps**
+4. **Next Steps**
    - Check out the [API Reference](./api-reference.md)
    - Explore [examples](../examples/)
    - Join the [community discussions](https://github.com/Octane0411/open-agent-sdk/discussions)

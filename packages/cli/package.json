@@ -1,7 +1,7 @@
 {
   "name": "@open-agent-sdk/cli",
   "version": "0.1.0-alpha.1",
-  "description": "CLI agent built on open-agent-sdk",
+  "description": "First-party CLI for the Open Agent SDK runtime",
   "bin": {
     "oas": "./src/index.ts"
   },

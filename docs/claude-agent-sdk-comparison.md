@@ -1,17 +1,19 @@
 # Open Agent SDK vs Claude Agent SDK
 
-This document summarizes the current comparison at the time of writing for the `0.1.0-alpha.x` line.
+This page is for migration and market context, not the primary product overview. At the `0.1.0-alpha.x` line, Open Agent SDK is positioned as an open agent runtime with a first-party CLI (`oas`) and an embeddable TypeScript SDK.
 
 ## Scope
 
 - Focuses on SDK capabilities relevant to application developers
 - Reflects the current implementation in this repository
 - Does not attempt to evaluate model quality or vendor service quality
+- Should be read as migration guidance, not as a drop-in parity claim
 
 ## Feature Comparison
 
 | Area | Open Agent SDK | Claude Agent SDK |
 |------|----------------|------------------|
+| Primary entry point | First-party CLI + embeddable TypeScript runtime | Vendor-maintained SDK |
 | Source model | Open source (MIT) | Closed source |
 | Provider strategy | Multi-provider (OpenAI / Google / Anthropic) | Primarily Anthropic ecosystem |
 | Agent loop model | Aligned: ReAct-style loop with tool execution | ReAct-style loop with tool execution |
@@ -25,6 +27,7 @@ This document summarizes the current comparison at the time of writing for the `
 ## Compatibility Notes
 
 - Open Agent SDK intentionally adopts familiar concepts from Claude Agent SDK: sessions, tool-first execution, permission gating, and extensibility hooks.
+- The main product story is different: Open Agent SDK centers a first-party agent surface (`oas`) and exposes the runtime underneath.
 - API-level parity is not guaranteed for every release. Treat compatibility as directional, not binary.
 - For migration-critical scenarios, validate specific APIs in your target version before rollout.
 
@@ -32,6 +35,7 @@ This document summarizes the current comparison at the time of writing for the `
 
 Open Agent SDK is best suited for teams that need:
 
+- A ready-to-run terminal agent plus an embeddable runtime
 - Source-level control and customizability
 - Flexibility to run across providers
 - A transparent agent runtime that can be adapted to internal infrastructure
