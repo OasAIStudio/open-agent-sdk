@@ -124,7 +124,13 @@ import json, sys
 try:
     d = json.load(open('$trial_result'))
     vr = d.get('verifier_result') or {}
+    # Harbor stores reward in different formats:
+    #   verifier_result.reward (flat)
+    #   verifier_result.rewards.reward (nested)
     r = vr.get('reward')
+    if r is None:
+        rewards = vr.get('rewards') or {}
+        r = rewards.get('reward')
     if r is not None:
         print(int(float(r) >= 0.5))
         sys.exit(0)
@@ -185,6 +191,14 @@ run_single_trial() {
     -k 1
     --agent-timeout-multiplier "$AGENT_TIMEOUT_MULTIPLIER"
   )
+
+  # Pass mirror/registry env vars for faster installs in China
+  if [ -n "${OAS_GITHUB_MIRROR:-}" ]; then
+    cmd+=(--ae "OAS_GITHUB_MIRROR=${OAS_GITHUB_MIRROR}")
+  fi
+  if [ -n "${OAS_NPM_REGISTRIES:-}" ]; then
+    cmd+=(--ae "OAS_NPM_REGISTRIES=${OAS_NPM_REGISTRIES}")
+  fi
 
   local model_lower
   model_lower="$(echo "$MODEL" | tr '[:upper:]' '[:lower:]')"
