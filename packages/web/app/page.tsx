@@ -16,15 +16,15 @@ const navItems = [
 
 const summaryItems = [
   {
-    title: 'CLI first',
+    title: 'CLI surface',
     description: 'Use oas to run and benchmark a complete terminal agent.'
   },
   {
-    title: 'Embeddable runtime',
+    title: 'Runtime API',
     description: 'Reuse sessions, permissions, tools, and hooks from TypeScript.'
   },
   {
-    title: 'Multi-provider',
+    title: 'Provider layer',
     description: 'OpenAI, Gemini, Anthropic, and Codex-oriented workflows in one core.'
   }
 ];
@@ -81,7 +81,7 @@ export default function HomePage() {
           <p className="home-kicker">TypeScript runtime + first-party CLI</p>
           <h1>
             <span>Open Agent SDK</span>
-            <span className="home-title-subtle">A clean runtime for agent products.</span>
+            <span className="home-title-subtle">Runtime for building agent products.</span>
           </h1>
           <p className="home-lede">
             Start with <code>oas</code> when you want an end-to-end terminal agent.
@@ -89,10 +89,10 @@ export default function HomePage() {
           </p>
           <div className="home-actions">
             <Link className="button button-primary" href={docsQuickstartUrl}>
-              Quickstart
+              Open docs
             </Link>
             <a className="button button-secondary" href={githubUrl} target="_blank" rel="noreferrer">
-              GitHub
+              View GitHub
             </a>
           </div>
           <div className="home-command" aria-label="Quickstart command">
