@@ -202,10 +202,17 @@ run_single_trial() {
 
   local model_lower
   model_lower="$(echo "$MODEL" | tr '[:upper:]' '[:lower:]')"
+
+  # Detect codex provider: explicit codex* model OR codex auth env vars present
+  local is_codex=false
+  if [[ "$model_lower" == codex* ]] || [ -n "${OAS_CODEX_API_KEY:-}" ] || [ -n "${OAS_CODEX_OAUTH_JSON:-}" ]; then
+    is_codex=true
+  fi
+
   if [[ "$model_lower" == minimax* ]]; then
     cmd+=(--ae "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
     cmd+=(--ae "ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}")
-  elif [[ "$model_lower" == codex* ]]; then
+  elif [ "$is_codex" = true ]; then
     if [ -n "${OAS_CODEX_API_KEY:-}" ]; then
       cmd+=(--ae "OAS_CODEX_API_KEY=${OAS_CODEX_API_KEY}")
     fi
