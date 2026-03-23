@@ -3,7 +3,7 @@
 
   <h1>Open Agent SDK</h1>
 
-  <p><strong>Minimal, production-ready TypeScript SDK for building tool-using AI agents.</strong></p>
+  <p><strong>Open agent runtime and first-party CLI for tool-using AI workflows.</strong></p>
 
   <p>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-000000?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License: MIT"></a>
@@ -12,7 +12,9 @@
   </p>
 </div>
 
-Build agents with a ReAct loop, tool permissions, hooks, subagents, session persistence, and multi-provider support.
+Open Agent SDK gives you a ready-to-run terminal agent via `oas` and an embeddable TypeScript runtime for building your own agent products.
+
+The default story is product-first: start with the CLI when you want an end-to-end agent surface, then drop to the SDK when you need custom UX, policies, or infrastructure.
 
 For Codex OAuth, run `codex login` once, then use `provider: 'codex'` in the SDK or `oas --provider codex` in the CLI. The SDK will reuse your local Codex login state from `~/.codex/auth.json`.
 
@@ -44,9 +46,10 @@ More runnable demos: [Demo Gallery](./DEMO_GALLERY.md).
 
 ## Why Open Agent SDK
 
+- Product-shaped entry point: `oas` gives you a first-party terminal agent, while the SDK exposes the same runtime for embedding.
 - Production safety controls: permission modes (`default`, `plan`, `acceptEdits`, `bypassPermissions`) and per-tool gating via `canUseTool`.
 - Agent extensibility core: hooks, skills, subagents, and MCP-compatible tool integration.
-- Reproducible evaluation path: local SWE-bench and Terminal-bench harnesses in `benchmark/`.
+- Reproducible evaluation path: benchmark the CLI like an agent product and reuse the runtime in custom apps.
 
 See details in:
 - [API Reference](./docs/api-reference.md)
@@ -56,6 +59,7 @@ See details in:
 
 ## Concepts
 
+- `CLI surface`: `oas` runs the same core runtime exposed by the SDK.
 - `Agent loop`: multi-turn ReAct with tool execution.
 - `Tool permissions`: explicit allow/deny policy hooks.
 - `Hooks`: lifecycle/tool events for observability and control.
@@ -73,12 +77,17 @@ See details in:
 ## Evaluation
 
 - SWE-bench Lite smoke/batch runners: `benchmark/swebench/scripts/`
-- Terminal-bench Harbor adapter and runbook: `benchmark/terminalbench/`
+- Terminal-bench Harbor adapter and runbook for the CLI agent surface: `benchmark/terminalbench/`
 - Result summarization scripts and artifacts: see [BENCHMARKS.md](./BENCHMARKS.md)
 
 ## Integrations
 
-Current provider support in core SDK:
+Primary surfaces:
+
+- `oas` first-party CLI
+- TypeScript SDK API
+
+Current provider support in the runtime:
 
 - Codex OAuth
 - OpenAI
@@ -96,7 +105,7 @@ Ecosystem integrations:
 - Docs: https://docs.openagentsdk.dev
 - GitHub: https://github.com/OasAIStudio/open-agent-sdk
 - [Introduction](./docs/introduction.md)
-- [Comparison with Claude Agent SDK](./docs/claude-agent-sdk-comparison.md)
+- [Migration and Claude Agent SDK comparison](./docs/claude-agent-sdk-comparison.md)
 
 ## Monorepo Layout
 

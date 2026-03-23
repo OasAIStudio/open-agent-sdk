@@ -14,114 +14,124 @@ const navItems = [
   { href: githubUrl, label: 'GitHub', external: true }
 ];
 
+const summaryItems = [
+  {
+    title: 'CLI first',
+    description: 'Use oas to run and benchmark a complete terminal agent.'
+  },
+  {
+    title: 'Embeddable runtime',
+    description: 'Reuse sessions, permissions, tools, and hooks from TypeScript.'
+  },
+  {
+    title: 'Multi-provider',
+    description: 'OpenAI, Gemini, Anthropic, and Codex-oriented workflows in one core.'
+  }
+];
+
+const entryLinks = [
+  {
+    href: docsQuickstartUrl,
+    label: 'Start here',
+    title: 'Quickstart',
+    description: 'Scaffold a project, run the CLI, and get to a working agent fast.',
+    action: 'Open'
+  },
+  {
+    href: docsApiUrl,
+    label: 'For builders',
+    title: 'API reference',
+    description: 'Use the runtime directly when you need custom UX, policies, or infrastructure.',
+    action: 'Browse'
+  },
+  {
+    href: docsMigrationUrl,
+    label: 'For migration',
+    title: 'Coming from Claude Agent SDK?',
+    description: 'Map the familiar concepts, then move to a runtime you can own end to end.',
+    action: 'Compare'
+  }
+];
+
 export default function HomePage() {
   return (
-    <main className="shell">
-      <div className="aurora" aria-hidden="true" />
-      <header className="topbar">
-        <div className="brand">Open Agent SDK</div>
-        <nav className="nav">
-          {navItems.map((item) => (
-            item.external ? (
-              <a key={item.href} href={item.href} target="_blank" rel="noreferrer">
-                {item.label}
-              </a>
-            ) : (
-              <Link key={item.href} href={item.href}>
-                {item.label}
-              </Link>
-            )
-          ))}
-        </nav>
-      </header>
-
-      <section className="hero">
-        <p className="eyebrow">Open-source agent sdk</p>
-        <h1>Claude Agent SDK-style APIs, open-source flexibility.</h1>
-        <p>
-          Build production-grade AI agents in TypeScript with a Claude-like developer
-          experience, aligned API patterns, and broader provider and plugin options.
-        </p>
-        <div className="hero-cta">
-          <Link className="btn btn-primary" href={docsUrl}>
-            Start with the docs
+    <main className="home">
+      <div className="home-shell">
+        <header className="home-header">
+          <Link className="brand-link" href="/">
+            <span className="brand-mark" aria-hidden="true" />
+            <span>Open Agent SDK</span>
           </Link>
-          <a className="btn btn-secondary" href={githubUrl} target="_blank" rel="noreferrer">
-            Star on GitHub
-          </a>
-        </div>
-      </section>
+          <nav className="home-nav" aria-label="Primary">
+            {navItems.map((item) => (
+              item.external ? (
+                <a key={item.href} href={item.href} target="_blank" rel="noreferrer">
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.href} href={item.href}>
+                  {item.label}
+                </Link>
+              )
+            ))}
+          </nav>
+        </header>
 
-      <section className="portal-grid" aria-label="Primary entries">
-        <Link className="portal-card portal-card-primary" href={docsQuickstartUrl}>
-          <h2>Start Building</h2>
-          <p>Install the SDK and run your first workflow in minutes.</p>
-          <span>Open quickstart</span>
-        </Link>
-        <Link className="portal-card" href={docsMigrationUrl}>
-          <h2>Migrate from Claude Agent SDK</h2>
-          <p>Use aligned API concepts and move existing flows with less friction.</p>
-          <span>See migration path</span>
-        </Link>
-        <Link className="portal-card" href={docsApiUrl}>
-          <h2>Evaluate the API Surface</h2>
-          <p>Review sessions, permissions, providers, hooks, and tool interfaces.</p>
-          <span>Browse API reference</span>
-        </Link>
-      </section>
+        <section className="home-hero">
+          <p className="home-kicker">TypeScript runtime + first-party CLI</p>
+          <h1>
+            <span>Open Agent SDK</span>
+            <span className="home-title-subtle">A clean runtime for agent products.</span>
+          </h1>
+          <p className="home-lede">
+            Start with <code>oas</code> when you want an end-to-end terminal agent.
+            Drop to the SDK when you need your own UI, tool policies, or infrastructure.
+          </p>
+          <div className="home-actions">
+            <Link className="button button-primary" href={docsQuickstartUrl}>
+              Quickstart
+            </Link>
+            <a className="button button-secondary" href={githubUrl} target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+          </div>
+          <div className="home-command" aria-label="Quickstart command">
+            <span className="home-command-prefix">$</span>
+            <code>npx open-agent-sdk@alpha init my-agent</code>
+          </div>
+        </section>
 
-      <section className="faq" aria-label="Frequently asked questions">
-        <h2>FAQ</h2>
-        <details>
-          <summary>Why not just use Claude Agent SDK directly?</summary>
-          <p>
-            Use Open Agent SDK when you want Claude Agent SDK-style APIs plus broader
-            provider and plugin options in one MIT-licensed codebase.
-          </p>
-        </details>
-        <details>
-          <summary>How open is this project?</summary>
-          <p>
-            The core SDK is open-source under MIT. You can inspect, fork, and extend
-            runtime behavior without black-box constraints.
-          </p>
-        </details>
-        <details>
-          <summary>Can we start simple and add controls later?</summary>
-          <p>
-            Yes. Start with one-shot prompts, then add sessions, permissions, hooks,
-            and tool policies as your workflows become more complex.
-          </p>
-        </details>
-        <details>
-          <summary>Which providers are supported?</summary>
-          <p>
-            OpenAI, Google Gemini, and Anthropic are supported today, with explicit
-            provider configuration and compatible endpoint patterns.
-          </p>
-        </details>
-      </section>
+        <section className="home-summary" aria-label="Core capabilities">
+          {summaryItems.map((item) => (
+            <div className="home-summary-item" key={item.title}>
+              <p className="home-summary-title">{item.title}</p>
+              <p className="home-summary-copy">{item.description}</p>
+            </div>
+          ))}
+        </section>
 
-      <section className="final-cta" aria-label="Final call to action">
-        <h2>Build now. Migrate safely. Stay open.</h2>
-        <p>
-          Ship with Claude Agent SDK-style APIs while keeping the flexibility to
-          choose providers and extensions as your product evolves.
-        </p>
-      </section>
+        <section className="home-links" aria-label="Primary paths">
+          {entryLinks.map((item) => (
+            <Link className="home-link-row" href={item.href} key={item.title}>
+              <div className="home-link-copy">
+                <p className="home-link-label">{item.label}</p>
+                <h2>{item.title}</h2>
+                <p>{item.description}</p>
+              </div>
+              <span className="home-link-action">{item.action}</span>
+            </Link>
+          ))}
+        </section>
 
-      <footer className="site-footer" aria-label="Site footer">
-        <p>
-          Built by{' '}
-          <a href="https://oasai.studio" target="_blank" rel="noreferrer">
-            OasAI Studio
-          </a>{' '}
-          · Open-source under MIT ·{' '}
-          <a href={githubUrl} target="_blank" rel="noreferrer">
-            View on GitHub
-          </a>
-        </p>
-      </footer>
+        <footer className="home-footer" aria-label="Site footer">
+          <p>Built by OasAI Studio. MIT licensed.</p>
+          <nav className="home-footer-nav" aria-label="Footer">
+            <Link href={docsUrl}>Docs</Link>
+            <a href={npmUrl} target="_blank" rel="noreferrer">npm</a>
+            <a href={githubUrl} target="_blank" rel="noreferrer">GitHub</a>
+          </nav>
+        </footer>
+      </div>
     </main>
   );
 }

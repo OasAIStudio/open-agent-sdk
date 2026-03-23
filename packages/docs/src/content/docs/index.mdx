@@ -1,14 +1,15 @@
 ---
 title: Open Agent SDK Documentation
-description: Open-source docs for Claude Agent SDK-style APIs, TypeScript integration, and multi-provider agent workflows.
+description: Docs for the Open Agent SDK runtime, first-party CLI, and TypeScript APIs for multi-provider agent workflows.
 ---
 
-Open Agent SDK is an open-source TypeScript agent SDK implemented around Claude Agent SDK API patterns, with broader provider and extension options for production teams.
+Open Agent SDK is an open agent runtime with two public entry points: the first-party `oas` CLI for complete terminal-agent workflows and the TypeScript SDK for embedding the same runtime in your own product.
 
 Use this documentation to move from install to production-ready workflows:
 
-- Learn the runtime model and API surface quickly
+- Learn the CLI and runtime model quickly
 - Implement tools, sessions, permissions, and hooks with confidence
+- Embed or extend the runtime without rewriting agent logic
 - Migrate Claude Agent SDK-style code with minimal friction
 
 ## Quick links
@@ -23,8 +24,9 @@ Use this documentation to move from install to production-ready workflows:
 
 ## Why teams adopt Open Agent SDK
 
+- **Product-shaped entry points:** Start with `oas`, then embed the same runtime through the SDK
 - **Open-source by default:** MIT-licensed core and transparent implementation
-- **Claude-style API ergonomics:** Familiar mental model and aligned workflow patterns
+- **Migration-friendly API ergonomics:** Familiar mental model and aligned workflow patterns
 - **Provider flexibility:** Integrate OpenAI, Gemini, and Anthropic without architecture rewrites
 - **Production controls:** First-class tooling for sessions, permissions, hooks, and MCP
 
