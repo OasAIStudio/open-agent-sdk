@@ -14,6 +14,8 @@
 
 Build agents with a ReAct loop, tool permissions, hooks, subagents, session persistence, and multi-provider support.
 
+For Codex OAuth, run `codex login` once, then use `provider: 'codex'` in the SDK or `oas --provider codex` in the CLI. The SDK will reuse your local Codex login state from `~/.codex/auth.json`.
+
 ## 1-Minute Quickstart
 
 ```bash
@@ -76,6 +78,7 @@ See details in:
 
 Current provider support in core SDK:
 
+- Codex OAuth
 - OpenAI
 - Google Gemini
 - Anthropic
@@ -128,6 +131,13 @@ Integration tests with real LLM APIs:
 
 ```bash
 env $(cat .env | xargs) bun test
+```
+
+Codex smoke test with your existing local login:
+
+```bash
+cd packages/core
+bun test tests/e2e/providers/codex.test.ts
 ```
 
 ## Project Status

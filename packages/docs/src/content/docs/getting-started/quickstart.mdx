@@ -5,13 +5,14 @@ description: Run your first prompt and session with Open Agent SDK.
 
 ## One-shot prompt
 
+Run `codex login` once first if you want to use Codex OAuth.
+
 ```ts
 import { prompt } from 'open-agent-sdk';
 
 const result = await prompt('Summarize the repository structure.', {
-  model: 'gpt-5.3-codex',
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY
+  model: 'gpt-5.4',
+  provider: 'codex'
 });
 
 console.log(result.result);
@@ -24,9 +25,8 @@ console.log(result.usage);
 import { createSession } from 'open-agent-sdk';
 
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY
+  model: 'gpt-5.4',
+  provider: 'codex'
 });
 
 await session.send('Read the current directory and list key files.');
@@ -44,3 +44,4 @@ session.close();
 
 - Configure runtime defaults in [Provider & Auth Strategy](/guides/provider-auth-strategy/)
 - Add safety controls in [Permissions & Safety](/guides/permissions-and-safety/)
+- Use `provider: 'openai'` with `OPENAI_API_KEY` if you prefer usage-based OpenAI Platform access instead of Codex OAuth

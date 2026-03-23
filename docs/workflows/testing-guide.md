@@ -25,10 +25,25 @@
 
 ### Environment Variables
 
-Integration tests require `.env` file with API keys:
+Integration tests can use API keys or a local Codex OAuth login, depending on provider:
 ```bash
+# OpenAI
 OPENAI_API_KEY=sk-...
-GOOGLE_API_KEY=...
+
+# Google Gemini
+GEMINI_API_KEY=...
+
+# Anthropic
+ANTHROPIC_API_KEY=...
+
+# Codex OAuth
+codex login
+CODEX_MODEL=gpt-5.4
+
+# Optional Codex overrides
+CODEX_HOME=~/.codex
+OAS_CODEX_AUTH_PATH=/custom/path/auth.json
+
 # Optional proxy
 OPENAI_BASE_URL=https://api.openai.com/v1
 HTTP_PROXY=http://localhost:7890
@@ -40,11 +55,21 @@ HTTP_PROXY=http://localhost:7890
 env $(cat .env | xargs) bun test
 ```
 
+For the real Codex smoke test, you can also rely on your existing local login state without an `.env` file:
+
+```bash
+cd packages/core
+bun test tests/e2e/providers/codex.test.ts
+```
+
 ### Skip Pattern
 
 ```typescript
-const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
-describe.skipIf(!hasOpenAIKey)('OpenAI Integration', () => { ... });
+const hasOpenAI = !!process.env.OPENAI_API_KEY;
+describe.skipIf(!hasOpenAI)('OpenAI Integration', () => { ... });
+
+const skipCodex = skipIfNoProvider('codex');
+describe.skipIf(skipCodex)('Codex Integration', () => { ... });
 ```
 
 ## Coverage Targets

@@ -25,6 +25,7 @@ Create a minimal parity test that runs your most common task end-to-end.
 
 ## 4. Map providers
 
+- Codex OAuth: run `codex login`, then set `provider: 'codex'`
 - OpenAI: set `provider: 'openai'` and `OPENAI_API_KEY`
 - Google: set `provider: 'google'` and `GEMINI_API_KEY`
 - Anthropic: set `provider: 'anthropic'` and `ANTHROPIC_API_KEY`
@@ -51,9 +52,8 @@ Recommended smoke checks before full rollout:
 import { createSession } from 'open-agent-sdk';
 
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   permissionMode: 'default',
 });
 

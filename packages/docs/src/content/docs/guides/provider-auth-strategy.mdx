@@ -22,12 +22,34 @@ Recommended pattern:
 1. Store provider keys in environment variables
 2. Resolve credentials at runtime by environment
 3. Keep provider selection explicit in integration code
+4. For Codex OAuth, reuse a local `codex login` session instead of hardcoding API keys
 
 Typical variables:
 
 - `OPENAI_API_KEY`
 - `GEMINI_API_KEY`
 - `ANTHROPIC_API_KEY`
+- `CODEX_HOME`
+- `OAS_CODEX_AUTH_PATH`
+
+## Codex OAuth
+
+Codex is a separate provider path in the SDK:
+
+```ts
+const result = await prompt('Summarize this repo.', {
+  model: 'gpt-5.4',
+  provider: 'codex',
+});
+```
+
+Recommended setup:
+
+1. Run `codex login`
+2. Let the SDK import `~/.codex/auth.json`
+3. Only override `codexOAuth.codexAuthPath` or `OAS_CODEX_AUTH_PATH` when you need a non-default login location
+
+Use `provider: 'openai'` with `OPENAI_API_KEY` when you want standard usage-based OpenAI Platform billing instead of Codex OAuth.
 
 ## Base URL strategy
 

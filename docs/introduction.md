@@ -235,8 +235,8 @@ Extend agent behavior with event hooks:
 ### 1. Code Assistant
 ```typescript
 const result = await prompt("Analyze this codebase and suggest improvements", {
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   allowedTools: ['Read', 'Glob', 'Grep'],
   cwd: './src',
 });
@@ -245,8 +245,8 @@ const result = await prompt("Analyze this codebase and suggest improvements", {
 ### 2. DevOps Automation
 ```typescript
 const result = await prompt("Check server health and restart if needed", {
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   allowedTools: ['Bash', 'Read'],
   permissionMode: 'default', // Requires approval for dangerous operations
 });
@@ -255,8 +255,8 @@ const result = await prompt("Check server health and restart if needed", {
 ### 3. Research Assistant
 ```typescript
 const session = createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   allowedTools: ['WebSearch', 'WebFetch', 'Write'],
 });
 
@@ -269,8 +269,8 @@ for await (const msg of session.stream()) {
 ### 4. Interactive Development
 ```typescript
 const session = createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   hooks: {
     onPermissionRequest: async (request) => {
       // Custom approval logic
@@ -305,12 +305,16 @@ const session = createSession({
    ```
 
 2. **Quick Example**
+   ```bash
+   codex login
+   ```
+
    ```typescript
    import { prompt } from 'open-agent-sdk';
    
    const result = await prompt("What files are in the current directory?", {
-     model: 'gpt-5.3-codex',
-     apiKey: process.env.OPENAI_API_KEY,
+     model: 'gpt-5.4',
+     provider: 'codex',
    });
    
    console.log(result.result);

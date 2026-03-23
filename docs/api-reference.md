@@ -18,6 +18,7 @@
   - [FileStorage](#filestorage)
 - [Providers](#providers)
   - [LLMProvider](#llmprovider)
+  - [CodexProvider](#codexprovider)
   - [OpenAIProvider](#openaiprovider)
   - [GoogleProvider](#googleprovider)
   - [AnthropicProvider](#anthropicprovider)
@@ -67,8 +68,8 @@ function prompt(
 import { prompt } from 'open-agent-sdk';
 
 const result = await prompt("What files are in the current directory?", {
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
 });
 
 console.log(result.result);
@@ -86,10 +87,11 @@ Configuration options for `prompt()` function.
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `model` | `string` | ✅ | Model identifier (e.g., 'gpt-5.3-codex', 'claude-opus-4.6') |
+| `model` | `string` | ✅ | Model identifier (e.g., 'gpt-5.4', 'gpt-4o', 'claude-sonnet-4-20250514') |
 | `apiKey` | `string` | | API key. Defaults to env var based on provider |
-| `provider` | `'openai' \| 'google' \| 'anthropic'` | | Provider to use. Auto-detected from model name if not specified |
-| `baseURL` | `string` | | Base URL for API (OpenAI only) |
+| `provider` | `'openai' \| 'google' \| 'anthropic' \| 'codex' \| 'openai-codex'` | | Provider to use. Auto-detected from model name if not specified |
+| `baseURL` | `string` | | Base URL for compatible APIs such as OpenAI-compatible or Anthropic-compatible endpoints |
+| `codexOAuth` | `CodexOAuthOptions` | | Codex OAuth configuration. Reuses `~/.codex/auth.json` by default |
 | `maxTurns` | `number` | | Maximum conversation turns. Default: `10` |
 | `allowedTools` | `string[]` | | Allowed tools whitelist. Default: all tools |
 | `systemPrompt` | `string` | | System prompt for the agent |
@@ -109,16 +111,17 @@ Configuration options for `prompt()` function.
 
 ```typescript
 const result = await prompt("Analyze the codebase", {
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   systemPrompt: "You are a code review assistant.",
   maxTurns: 15,
   allowedTools: ['Read', 'Glob', 'Grep'],
   cwd: './src',
-  env: { NODE_ENV: 'development' },
   permissionMode: 'default',
 });
 ```
+
+For Codex OAuth, run `codex login` once before your first SDK call. By default the SDK imports credentials from `~/.codex/auth.json` and persists refreshed provider credentials under `~/.open-agent/auth/providers.json`.
 
 ---
 
@@ -166,8 +169,8 @@ import { createSession, FileStorage } from 'open-agent-sdk';
 
 const storage = new FileStorage({ directory: './.sessions' });
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   storage,
 });
 
@@ -213,7 +216,7 @@ import { resumeSession, FileStorage } from 'open-agent-sdk';
 const storage = new FileStorage();
 const session = await resumeSession('session-123', {
   storage,
-  apiKey: process.env.OPENAI_API_KEY,
+  codexOAuth: { allowInteractiveLogin: true },
 });
 
 await session.send("Continue from where we left off");
@@ -254,8 +257,8 @@ import { forkSession, FileStorage } from 'open-agent-sdk';
 const storage = new FileStorage();
 const forkedSession = await forkSession('session-123', {
   storage,
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
 });
 
 // Forked session has the same history but is independent
@@ -335,8 +338,8 @@ import { createSession, InMemoryStorage } from 'open-agent-sdk';
 
 const storage = new InMemoryStorage();
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   storage,
 });
 ```
@@ -366,8 +369,8 @@ import { createSession, FileStorage } from 'open-agent-sdk';
 
 const storage = new FileStorage({ directory: './my-sessions' });
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   storage,
 });
 ```
@@ -404,6 +407,40 @@ class MyCustomProvider extends LLMProvider {
 
 ---
 
+### `CodexProvider`
+
+Codex provider that reuses your local Codex OAuth login state.
+
+#### Constructor
+
+```typescript
+new CodexProvider(config: CodexConfig)
+```
+
+#### Configuration
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `model` | `string` | ✅ | Codex model identifier |
+| `apiKey` | `string` | | Optional explicit short-lived token. Usually omitted |
+| `codexOAuth` | `CodexOAuthOptions` | | OAuth config. Defaults to importing from `~/.codex/auth.json` |
+| `transport` | `'sse' \| 'websocket' \| 'auto'` | | Codex transport. Default: `sse` |
+
+#### Example
+
+```typescript
+import { CodexProvider } from 'open-agent-sdk';
+
+const provider = new CodexProvider({
+  model: 'gpt-5.4',
+  codexOAuth: {
+    allowInteractiveLogin: true,
+  },
+});
+```
+
+---
+
 ### `OpenAIProvider`
 
 OpenAI API provider.
@@ -429,7 +466,7 @@ import { OpenAIProvider } from 'open-agent-sdk';
 
 const provider = new OpenAIProvider({
   apiKey: process.env.OPENAI_API_KEY,
-  model: 'gpt-5.3-codex',
+  model: 'gpt-4o',
 });
 ```
 
@@ -459,7 +496,7 @@ import { GoogleProvider } from 'open-agent-sdk';
 
 const provider = new GoogleProvider({
   apiKey: process.env.GEMINI_API_KEY,
-  model: 'gpt-5.3-codex',
+  model: 'gemini-2.0-flash',
 });
 ```
 
@@ -665,8 +702,8 @@ if (result.allowed) {
 
 ```typescript
 const result = await prompt("Edit config file", {
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   permissionMode: 'acceptEdits', // Auto-approve edits
 });
 ```
@@ -695,8 +732,8 @@ The SDK provides 9 hook events for extending agent behavior:
 
 ```typescript
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   hooks: {
     onTurnStart: async ({ turnNumber }) => {
       console.log(`Turn ${turnNumber} starting...`);
@@ -839,6 +876,8 @@ Tool execution output.
 | `OPENAI_API_KEY` | OpenAI API key |
 | `GEMINI_API_KEY` | Google Gemini API key |
 | `ANTHROPIC_API_KEY` | Anthropic API key |
+| `CODEX_HOME` | Override the Codex credential directory. Defaults to `~/.codex` |
+| `OAS_CODEX_AUTH_PATH` | Override the Codex auth file path used by SDK and tests |
 | `OPEN_AGENT_SDK_LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error`, `silent` |
 
 ---

@@ -11,6 +11,8 @@ See [`quickstart/`](./quickstart/) for a comprehensive introduction to the SDK.
 export OPENAI_API_KEY="your-api-key"
 # or
 export GEMINI_API_KEY="your-api-key"
+# or login for Codex-backed examples and SDK usage
+codex login
 
 # Run quickstart suite
 cd examples/quickstart
@@ -90,10 +92,11 @@ Use $ARGUMENTS to reference what the user typed after /skill-name.
 
 ## Running Examples
 
-All examples require an API key. Set one of these environment variables:
+Examples use provider-specific auth. Depending on the script, either set an API key or log in with Codex:
 
 - `OPENAI_API_KEY` - For OpenAI provider
 - `GEMINI_API_KEY` - For Google Gemini provider
+- `codex login` - For Codex OAuth provider flows
 
 Then run with:
 

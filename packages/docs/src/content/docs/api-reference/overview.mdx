@@ -20,9 +20,8 @@ import { prompt, createSession, resumeSession, forkSession } from 'open-agent-sd
 import { prompt } from 'open-agent-sdk';
 
 const out = await prompt('Summarize this repository.', {
-  model: 'gpt-5.3-codex',
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   maxTurns: 8,
   permissionMode: 'default'
 });
@@ -39,9 +38,10 @@ const out = await prompt('Summarize this repository.', {
 Common `PromptOptions` fields:
 
 - `model: string` (required)
-- `provider?: 'openai' | 'google' | 'anthropic'`
+- `provider?: 'openai' | 'google' | 'anthropic' | 'codex' | 'openai-codex'`
 - `apiKey?: string`
 - `baseURL?: string`
+- `codexOAuth?: CodexOAuthOptions`
 - `maxTurns?: number`
 - `allowedTools?: string[]`
 - `permissionMode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan'`
@@ -56,9 +56,8 @@ Common `PromptOptions` fields:
 import { createSession } from 'open-agent-sdk';
 
 const session = await createSession({
-  model: 'gpt-5.3-codex',
-  provider: 'openai',
-  apiKey: process.env.OPENAI_API_KEY,
+  model: 'gpt-5.4',
+  provider: 'codex',
   systemPrompt: 'You are a repository assistant.',
   maxTurns: 12,
 });
@@ -84,18 +83,19 @@ import { resumeSession, forkSession, FileStorage } from 'open-agent-sdk';
 
 const storage = new FileStorage({ cwd: process.cwd() });
 const resumed = await resumeSession('session-id', { storage });
-const forked = await forkSession('session-id', { storage, model: 'gpt-5.3-codex' });
+const forked = await forkSession('session-id', { storage, model: 'gpt-5.4', provider: 'codex' });
 ```
 
 ## Providers and authentication
 
 Supported providers:
 
+- Codex OAuth
 - OpenAI
 - Google Gemini
 - Anthropic
 
-Provider can be explicit (`provider`) or auto-detected from model naming conventions.
+Provider can be explicit (`provider`) or auto-detected from model naming conventions. For Codex OAuth, run `codex login` once and then use `provider: 'codex'`.
 
 ### Base URL behavior
 
