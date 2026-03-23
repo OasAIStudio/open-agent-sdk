@@ -205,6 +205,13 @@ run_single_trial() {
   if [[ "$model_lower" == minimax* ]]; then
     cmd+=(--ae "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
     cmd+=(--ae "ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}")
+  elif [[ "$model_lower" == codex* ]]; then
+    if [ -n "${OAS_CODEX_API_KEY:-}" ]; then
+      cmd+=(--ae "OAS_CODEX_API_KEY=${OAS_CODEX_API_KEY}")
+    fi
+    if [ -n "${OAS_CODEX_OAUTH_JSON:-}" ]; then
+      cmd+=(--ae "OAS_CODEX_OAUTH_JSON=${OAS_CODEX_OAUTH_JSON}")
+    fi
   elif [[ "$model_lower" == gemini* ]] || [[ "$model_lower" == google* ]]; then
     cmd+=(--ae "GEMINI_API_KEY=${GEMINI_API_KEY:-}")
   elif [[ "$model_lower" == claude* ]]; then

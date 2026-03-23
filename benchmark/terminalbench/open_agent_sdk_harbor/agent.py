@@ -24,6 +24,18 @@ Usage:
       --model claude-sonnet-4 \
       --ae ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
 
+    # Codex (via API key)
+    harbor run -d terminal-bench@2.0 \
+      --agent-import-path "harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent" \
+      --model codex-mini \
+      --ae OAS_CODEX_API_KEY=$OAS_CODEX_API_KEY
+
+    # Codex (via OAuth credentials JSON)
+    harbor run -d terminal-bench@2.0 \
+      --agent-import-path "harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent" \
+      --model codex-mini \
+      --ae OAS_CODEX_OAUTH_JSON='{"access":"...","refresh":"...","expires":...}'
+
 Note: Environment variables MUST be passed via --ae flag for Docker container access.
 """
 
@@ -43,6 +55,11 @@ def is_minimax_model(model_name: str) -> bool:
     return model_name.lower().startswith("minimax")
 
 
+def is_codex_model(model_name: str) -> bool:
+    """Check if the model is a Codex model."""
+    return model_name.lower().startswith("codex")
+
+
 def get_required_env_var_names(model_name: str) -> list[str]:
     """
     Determine required environment variable names based on model name.
@@ -56,6 +73,10 @@ def get_required_env_var_names(model_name: str) -> list[str]:
     # MiniMax uses Anthropic compatible endpoint
     if is_minimax_model(model_name):
         return ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL"]
+
+    # Codex uses its own auth (API key or OAuth)
+    if is_codex_model(model_name):
+        return ["OAS_CODEX_API_KEY", "OAS_CODEX_OAUTH_JSON"]
 
     # Standard providers
     if model_lower.startswith("gemini") or model_lower.startswith("google"):
@@ -107,6 +128,14 @@ class OpenAgentSDKAgent(BaseInstalledAgent):
             cli_flags += " --no-persist"
         if is_minimax_model(model):
             cli_flags = f'--provider anthropic --base-url "$ANTHROPIC_BASE_URL" {cli_flags}'
+        elif is_codex_model(model):
+            # Codex provider with API key or OAuth credentials
+            codex_auth_flags = '--provider codex'
+            if os.environ.get("OAS_CODEX_API_KEY"):
+                codex_auth_flags += ' --codex-api-key "$OAS_CODEX_API_KEY"'
+            elif os.environ.get("OAS_CODEX_OAUTH_JSON"):
+                codex_auth_flags += ' --codex-oauth-json "$OAS_CODEX_OAUTH_JSON"'
+            cli_flags = f'{codex_auth_flags} {cli_flags}'
 
         # Use heredoc to safely pass instruction without escaping
         # This handles multi-line text and special characters correctly
