@@ -86,13 +86,12 @@ if ! command -v "$HARBOR_BIN" >/dev/null 2>&1 && [ ! -x "$HARBOR_BIN" ]; then
   exit 1
 fi
 
-HARBOR_RUN_HELP="$("$HARBOR_BIN" run --help 2>&1 || true)"
-if echo "$HARBOR_RUN_HELP" | grep -q -- '--agent-timeout-multiplier'; then
+if "$HARBOR_BIN" run --agent-timeout-multiplier 1 --help >/dev/null 2>&1; then
   TIMEOUT_MULTIPLIER_FLAG="--agent-timeout-multiplier"
-elif echo "$HARBOR_RUN_HELP" | grep -q -- '--timeout-multiplier'; then
+elif "$HARBOR_BIN" run --timeout-multiplier 1 --help >/dev/null 2>&1; then
   TIMEOUT_MULTIPLIER_FLAG="--timeout-multiplier"
 else
-  echo "Could not determine Harbor timeout multiplier flag from: $HARBOR_BIN run --help" >&2
+  echo "Could not determine Harbor timeout multiplier flag for: $HARBOR_BIN run" >&2
   exit 1
 fi
 
