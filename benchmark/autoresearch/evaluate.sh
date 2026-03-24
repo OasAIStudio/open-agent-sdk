@@ -28,6 +28,7 @@ AGENT_TIMEOUT_MULTIPLIER="0.6"
 SLEEP_BETWEEN=3
 HARBOR_BIN="${HARBOR_BIN:-harbor}"
 TIMEOUT_MULTIPLIER_FLAG=""
+AGENT_ENV_FLAG=""
 
 usage() {
   cat <<'EOF'
@@ -93,6 +94,10 @@ elif "$HARBOR_BIN" run --timeout-multiplier 1 --help >/dev/null 2>&1; then
 else
   echo "Could not determine Harbor timeout multiplier flag for: $HARBOR_BIN run" >&2
   exit 1
+fi
+
+if "$HARBOR_BIN" run --ae FOO=bar --help >/dev/null 2>&1; then
+  AGENT_ENV_FLAG="--ae"
 fi
 
 # Parse tasks
@@ -240,11 +245,11 @@ run_single_trial() {
   )
 
   # Pass mirror/registry env vars for faster installs in China
-  if [ -n "${OAS_GITHUB_MIRROR:-}" ]; then
-    cmd+=(--ae "OAS_GITHUB_MIRROR=${OAS_GITHUB_MIRROR}")
+  if [ -n "$AGENT_ENV_FLAG" ] && [ -n "${OAS_GITHUB_MIRROR:-}" ]; then
+    cmd+=("$AGENT_ENV_FLAG" "OAS_GITHUB_MIRROR=${OAS_GITHUB_MIRROR}")
   fi
-  if [ -n "${OAS_NPM_REGISTRIES:-}" ]; then
-    cmd+=(--ae "OAS_NPM_REGISTRIES=${OAS_NPM_REGISTRIES}")
+  if [ -n "$AGENT_ENV_FLAG" ] && [ -n "${OAS_NPM_REGISTRIES:-}" ]; then
+    cmd+=("$AGENT_ENV_FLAG" "OAS_NPM_REGISTRIES=${OAS_NPM_REGISTRIES}")
   fi
 
   local model_lower
@@ -257,22 +262,30 @@ run_single_trial() {
   fi
 
   if [[ "$model_lower" == minimax* ]]; then
-    cmd+=(--ae "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
-    cmd+=(--ae "ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}")
+    if [ -n "$AGENT_ENV_FLAG" ]; then
+      cmd+=("$AGENT_ENV_FLAG" "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
+      cmd+=("$AGENT_ENV_FLAG" "ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}")
+    fi
   elif [ "$is_codex" = true ]; then
     # Note: OAS_CODEX_OAUTH_JSON is NOT passed via --ae because:
     # 1. JSON with quotes breaks shell escaping in Docker env vars
     # 2. The adapter embeds credentials directly in the command via heredoc
     # The adapter reads OAS_CODEX_OAUTH_JSON from the host's os.environ instead.
-    if [ -n "${OAS_CODEX_API_KEY:-}" ]; then
-      cmd+=(--ae "OAS_CODEX_API_KEY=${OAS_CODEX_API_KEY}")
+    if [ -n "$AGENT_ENV_FLAG" ] && [ -n "${OAS_CODEX_API_KEY:-}" ]; then
+      cmd+=("$AGENT_ENV_FLAG" "OAS_CODEX_API_KEY=${OAS_CODEX_API_KEY}")
     fi
   elif [[ "$model_lower" == gemini* ]] || [[ "$model_lower" == google* ]]; then
-    cmd+=(--ae "GEMINI_API_KEY=${GEMINI_API_KEY:-}")
+    if [ -n "$AGENT_ENV_FLAG" ]; then
+      cmd+=("$AGENT_ENV_FLAG" "GEMINI_API_KEY=${GEMINI_API_KEY:-}")
+    fi
   elif [[ "$model_lower" == claude* ]]; then
-    cmd+=(--ae "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
+    if [ -n "$AGENT_ENV_FLAG" ]; then
+      cmd+=("$AGENT_ENV_FLAG" "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}")
+    fi
   elif [[ "$model_lower" == gpt* ]] || [[ "$model_lower" == openai* ]]; then
-    cmd+=(--ae "OPENAI_API_KEY=${OPENAI_API_KEY:-}")
+    if [ -n "$AGENT_ENV_FLAG" ]; then
+      cmd+=("$AGENT_ENV_FLAG" "OPENAI_API_KEY=${OPENAI_API_KEY:-}")
+    fi
   fi
 
   local run_output rc

@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Pre-warmed images install bun/oas under /root/.bun/bin. Put those locations on
+# PATH before the fast-path check so setup can detect the existing CLI.
+export PATH="/root/.bun/bin:$HOME/.bun/bin:$PATH"
+
 # Fast path: skip install if oas CLI is already available (pre-warmed image)
 # unless this run explicitly requests a fresh local tarball install.
 if [ -z "${OAS_LOCAL_TARBALL_URL:-}" ] && command -v oas &>/dev/null && command -v bun &>/dev/null; then
@@ -88,7 +92,6 @@ if ! command -v bun &> /dev/null; then
     retry 5 3 bash -c "curl -fsSL --connect-timeout 10 --max-time 120 --retry 5 --retry-all-errors https://bun.sh/install | bash"
     unset GITHUB
 fi
-export PATH="$HOME/.bun/bin:$PATH"
 
 # Install CLI: from local tarballs (OAS_LOCAL_TARBALL_URL) or npm registry
 if [ -n "${OAS_LOCAL_TARBALL_URL:-}" ]; then

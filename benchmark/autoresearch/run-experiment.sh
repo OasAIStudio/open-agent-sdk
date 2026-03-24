@@ -225,6 +225,8 @@ PY
   export OAS_LOCAL_TARBALL_URL="http://${TARBALL_HOST}:${TARBALL_PORT}"
   echo "Local tarball URL: $OAS_LOCAL_TARBALL_URL"
   echo ""
+else
+  unset OAS_LOCAL_TARBALL_URL
 fi
 
 resolve_harbor_python

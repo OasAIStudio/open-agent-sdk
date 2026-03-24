@@ -117,6 +117,24 @@ class OpenAgentSDKAgent(BaseInstalledAgent):
         """Path to the install script template."""
         return Path(__file__).parent / "install-open-agent-sdk.sh.j2"
 
+    def _build_exec_env(self, model_name: str) -> dict[str, str]:
+        """Collect host env vars that must be present inside the container."""
+        env: dict[str, str] = {}
+        for key in get_required_env_var_names(model_name):
+            val = os.environ.get(key)
+            if val:
+                env[key] = val
+        for key in (
+            "OAS_GITHUB_MIRROR",
+            "OAS_NPM_REGISTRIES",
+            "OAS_LOCAL_TARBALL_URL",
+            "OAS_PACKAGE_VERSION",
+        ):
+            val = os.environ.get(key)
+            if val:
+                env[key] = val
+        return env
+
     def _setup_env(self) -> dict[str, str]:
         """Pass mirror/local-install env vars to install script."""
         env = super()._setup_env()
@@ -131,6 +149,7 @@ class OpenAgentSDKAgent(BaseInstalledAgent):
 
     def create_run_agent_commands(self, instruction: str) -> list[ExecInput]:
         model = self.model_name or "gemini-2.0-flash"
+        exec_env = self._build_exec_env(model)
 
         # Build CLI command with provider-specific flags.
         # IMPORTANT:
@@ -207,6 +226,7 @@ exit $RC"""
         return [
             ExecInput(
                 command=command,
+                env=exec_env,
                 timeout_sec=600,
             )
         ]
