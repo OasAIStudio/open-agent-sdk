@@ -34,6 +34,7 @@ TARBALL_SERVER_PID=""
 TARBALL_SERVER_LOG=""
 HARBOR_BIN="${HARBOR_BIN:-harbor}"
 HARBOR_PYTHON="${HARBOR_PYTHON:-}"
+HARBOR_PYTHONPATH="${HARBOR_PYTHONPATH:-}"
 SKIP_PREWARM_CHECK=false
 
 usage() {
@@ -121,6 +122,24 @@ resolve_harbor_python() {
         return
       fi
     fi
+
+    if grep -q 'from harbor\.cli\.main import app' "$harbor_path" 2>/dev/null; then
+      local wrapper_python
+      local wrapper_python_expr
+      local wrapper_pythonpath_expr
+      wrapper_python_expr="$(sed -n 's/^exec \"\\(.*\\)\" -c .*/\\1/p' "$harbor_path" | head -1)"
+      wrapper_pythonpath_expr="$(sed -n 's/^export PYTHONPATH=\"\\(.*\\)\"$/\\1/p' "$harbor_path" | head -1)"
+      if [ -n "$wrapper_python_expr" ]; then
+        wrapper_python="$(eval "printf '%s' \"$wrapper_python_expr\"")"
+        if [ -x "$wrapper_python" ]; then
+          HARBOR_PYTHON="$wrapper_python"
+          if [ -n "$wrapper_pythonpath_expr" ]; then
+            HARBOR_PYTHONPATH="$(eval "printf '%s' \"$wrapper_pythonpath_expr\"")"
+          fi
+          return
+        fi
+      fi
+    fi
   fi
 
   if python3 -c 'import harbor' >/dev/null 2>&1; then
@@ -137,7 +156,7 @@ resolve_harbor_python() {
 
 ensure_harbor_registration() {
   local agents_dir
-  agents_dir="$("$HARBOR_PYTHON" - <<'PY'
+  agents_dir="$(env ${HARBOR_PYTHONPATH:+PYTHONPATH="$HARBOR_PYTHONPATH"} "$HARBOR_PYTHON" - <<'PY'
 import harbor
 from pathlib import Path
 print(Path(harbor.__path__[0]) / "agents" / "installed")
