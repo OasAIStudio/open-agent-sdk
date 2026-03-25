@@ -36,6 +36,7 @@ graph TD
   E1 --> E2
 ```
 
+<<<<<<< HEAD
 ## Visual Review
 
 ### Legend
@@ -74,6 +75,8 @@ graph TD
 - `E2` did not make the agent smarter; it made the campaign reviewable.
 - The first actual optimization candidate starts after `E2`.
 
+=======
+>>>>>>> 8a14571 (chore(autoresearch): record E2 smoke-5 baseline)
 ## Experiments
 
 ### E1
