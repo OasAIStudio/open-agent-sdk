@@ -112,23 +112,15 @@ resolve_harbor_python() {
   if command -v "$HARBOR_BIN" >/dev/null 2>&1; then
     local harbor_path
     local harbor_shebang
+    local candidate=""
     harbor_path="$(command -v "$HARBOR_BIN")"
     harbor_shebang="$(head -n 1 "$harbor_path" 2>/dev/null || true)"
-    if [[ "$harbor_shebang" == '#!'* ]]; then
-      local candidate="${harbor_shebang#\#!}"
-      candidate="${candidate%% *}"
-      if [ -x "$candidate" ]; then
-        HARBOR_PYTHON="$candidate"
-        return
-      fi
-    fi
-
     if grep -q 'from harbor\.cli\.main import app' "$harbor_path" 2>/dev/null; then
       local wrapper_python
       local wrapper_python_expr
       local wrapper_pythonpath_expr
-      wrapper_python_expr="$(sed -n 's/^exec \"\\(.*\\)\" -c .*/\\1/p' "$harbor_path" | head -1)"
-      wrapper_pythonpath_expr="$(sed -n 's/^export PYTHONPATH=\"\\(.*\\)\"$/\\1/p' "$harbor_path" | head -1)"
+      wrapper_python_expr="$(sed -n 's/^exec "\(.*\)" -c .*/\1/p' "$harbor_path" | head -1)"
+      wrapper_pythonpath_expr="$(sed -n 's/^export PYTHONPATH="\(.*\)"$/\1/p' "$harbor_path" | head -1)"
       if [ -n "$wrapper_python_expr" ]; then
         wrapper_python="$(eval "printf '%s' \"$wrapper_python_expr\"")"
         if [ -x "$wrapper_python" ]; then
@@ -138,6 +130,15 @@ resolve_harbor_python() {
           fi
           return
         fi
+      fi
+    fi
+
+    if [[ "$harbor_shebang" == '#!'* ]]; then
+      candidate="${harbor_shebang#\#!}"
+      candidate="${candidate%% *}"
+      if [ -n "$candidate" ] && [ "$(basename "$candidate")" != "env" ] && [ -x "$candidate" ]; then
+        HARBOR_PYTHON="$candidate"
+        return
       fi
     fi
   fi
