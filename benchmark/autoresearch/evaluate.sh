@@ -75,14 +75,24 @@ if ! [[ "$K" =~ ^[1-9][0-9]*$ ]]; then
   exit 1
 fi
 
-# Load API keys from .env
+# Load API keys from .env, but keep any runtime-injected local tarball wiring.
 MAIN_GIT_DIR="$(git -C "$REPO_ROOT" rev-parse --git-common-dir)"
 MAIN_ENV_FILE="$(cd "$MAIN_GIT_DIR/.." && pwd)/.env"
+RUNTIME_OAS_LOCAL_TARBALL_URL="${OAS_LOCAL_TARBALL_URL-__OAS_UNSET__}"
+RUNTIME_OAS_DISABLE_LOCAL_TARBALLS="${OAS_DISABLE_LOCAL_TARBALLS-__OAS_UNSET__}"
 if [ -f "$MAIN_ENV_FILE" ]; then
   set -a
   # shellcheck disable=SC1090
   source "$MAIN_ENV_FILE"
   set +a
+fi
+
+if [ "$RUNTIME_OAS_LOCAL_TARBALL_URL" != "__OAS_UNSET__" ]; then
+  export OAS_LOCAL_TARBALL_URL="$RUNTIME_OAS_LOCAL_TARBALL_URL"
+fi
+
+if [ "$RUNTIME_OAS_DISABLE_LOCAL_TARBALLS" != "__OAS_UNSET__" ]; then
+  export OAS_DISABLE_LOCAL_TARBALLS="$RUNTIME_OAS_DISABLE_LOCAL_TARBALLS"
 fi
 
 if [ "${OAS_DISABLE_LOCAL_TARBALLS:-}" = "1" ] || [ "${OAS_DISABLE_LOCAL_TARBALLS:-}" = "true" ]; then
