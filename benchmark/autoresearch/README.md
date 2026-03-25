@@ -20,7 +20,9 @@ Start with:
   - `benchmark/autoresearch/evaluate.sh`
   - Harbor + `terminal-bench@2.0`
   - task list defaults to `benchmark/terminalbench/task-lists/smoke-5.txt`
-- Results are append-only in `benchmark/autoresearch/results.tsv`
+- Results are append-only in:
+  - `benchmark/autoresearch/results.tsv` for experiment-level aggregates
+  - `benchmark/autoresearch/results_tasks.tsv` for task-level aggregates
 
 This is similar in spirit to
 https://github.com/karpathy/autoresearch:
@@ -70,6 +72,7 @@ The script will:
 - run `bun test`
 - run `evaluate.sh`
 - append a row to `results.tsv`
+- append one row per task to `results_tasks.tsv`
 - compare the latest row to the previous row
 - emit `KEEP` or `REVERT`
 - optionally `git reset --hard HEAD~1` while preserving the results log
@@ -111,5 +114,21 @@ Each campaign should leave behind:
 
 - a dedicated experiment branch
 - append-only rows in `results.tsv`
+- append-only rows in `results_tasks.tsv`
 - a run report copied from `report-template.md`
 - a Mermaid experiment tree that shows the hypothesis and metrics for each node
+
+## Reading Task Stability
+
+`results_tasks.tsv` includes a compact `statuses` column for each task.
+
+- `P` means one trial passed
+- `F` means one trial finished but failed verifier thresholds
+- `E` means one trial hit an infrastructure/runtime error
+
+Examples for `k=3`:
+
+- `PPP`: all three trials passed, so the task has `pass@3 = 1` and `pass^3 = 1`
+- `PPF`: at least one trial passed but not all, so `pass@3 = 1` and `pass^3 = 0`
+- `FFF`: no trial passed, so `pass@3 = 0` and `pass^3 = 0`
+- `PPE`: two passes and one infrastructure error

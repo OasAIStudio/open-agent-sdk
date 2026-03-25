@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUTPUT="${REPO_ROOT}/benchmark/autoresearch/results.tsv"
+TASK_OUTPUT="${REPO_ROOT}/benchmark/autoresearch/results_tasks.tsv"
 TASKS_FILE="${REPO_ROOT}/benchmark/terminalbench/task-lists/smoke-5.txt"
 MODEL="MiniMax-M2.5"
 K=3
@@ -55,6 +56,7 @@ Options:
   -k N                    Trials per task (default: 3)
   --sleep N               Sleep between trials (default: 3)
   --output FILE           results.tsv path (default: benchmark/autoresearch/results.tsv)
+  --task-output FILE      results_tasks.tsv path (default: benchmark/autoresearch/results_tasks.tsv)
   --no-local-tarballs     Use whatever is already installed in task images
   --tarball-dir DIR       Directory for generated local tarballs
   --tarball-port N        HTTP port for temporary local tarball server
@@ -75,6 +77,7 @@ while (($#)); do
     -k) K="${2:-}"; shift 2 ;;
     --sleep) SLEEP_BETWEEN="${2:-}"; shift 2 ;;
     --output) OUTPUT="${2:-}"; shift 2 ;;
+    --task-output) TASK_OUTPUT="${2:-}"; shift 2 ;;
     --no-local-tarballs) USE_LOCAL_TARBALLS=false; shift ;;
     --tarball-dir) TARBALL_DIR="${2:-}"; shift 2 ;;
     --tarball-port) TARBALL_PORT="${2:-}"; shift 2 ;;
@@ -294,7 +297,8 @@ echo "=== Running benchmark evaluation ==="
   -k "$K" \
   --sleep "$SLEEP_BETWEEN" \
   --tag "$TAG" \
-  --output "$OUTPUT"
+  --output "$OUTPUT" \
+  --task-output "$TASK_OUTPUT"
 echo ""
 
 DECISION_JSON="$(

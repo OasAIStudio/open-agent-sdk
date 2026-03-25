@@ -20,17 +20,19 @@ Every autoresearch session is expected to produce four artifacts:
 
 1. An experiment branch, usually named `exp/autoresearch-<tag>`
 2. An append-only metric log in `benchmark/autoresearch/results.tsv`
-3. A human-readable experiment report copied from
+3. An append-only task-level log in `benchmark/autoresearch/results_tasks.tsv`
+4. A human-readable experiment report copied from
    `benchmark/autoresearch/report-template.md`
-4. A Mermaid experiment tree embedded in the report, showing:
+5. A Mermaid experiment tree embedded in the report, showing:
    - experiment IDs
    - parent/child relationships
    - the hypothesis for each node
    - pass@k and pass^k for each node
    - whether the node was kept or reverted
 
-The git branch is not the source of truth for experiment history. The report and
-`results.tsv` must record both successful and reverted experiments.
+The git branch is not the source of truth for experiment history. The report,
+`results.tsv`, and `results_tasks.tsv` must record both successful and reverted
+experiments.
 
 ## Branch Strategy
 
@@ -149,6 +151,13 @@ For each experiment node, record:
 - `avg_trial_rate`
 - `decision`
 - `notes`
+
+Also retain the task-level summary from `results_tasks.tsv`, including:
+
+- `task_name`
+- `statuses` such as `PPP`, `PPF`, `FFF`, `PPE`
+- per-task `pass@k`
+- per-task `pass^k`
 
 Also keep a short summary section with:
 

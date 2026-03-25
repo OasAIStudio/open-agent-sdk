@@ -21,6 +21,7 @@ MODEL="MiniMax-M2.5"
 K=3
 TAG="eval"
 OUTPUT=""
+TASK_OUTPUT=""
 DATASET="terminal-bench@2.0"
 ENV_TYPE="docker"
 AGENT_IMPORT_PATH="harbor.agents.installed.open_agent_sdk:OpenAgentSDKAgent"
@@ -40,6 +41,7 @@ Options:
   -k N                 Trials per task (default: 3)
   --tag TAG            Label for this run (default: "eval")
   --output FILE        Append TSV summary to file
+  --task-output FILE   Append per-task TSV rows to file
   --sleep N            Seconds between trials (default: 3)
   -h, --help           Show help
 
@@ -56,6 +58,7 @@ while (($#)); do
     -k) K="${2:-}"; shift 2 ;;
     --tag) TAG="${2:-}"; shift 2 ;;
     --output) OUTPUT="${2:-}"; shift 2 ;;
+    --task-output) TASK_OUTPUT="${2:-}"; shift 2 ;;
     --sleep) SLEEP_BETWEEN="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
@@ -113,6 +116,23 @@ TASK_COUNT="$(wc -l < "$TASKS_TMP" | tr -d ' ')"
 echo "=== autoresearch evaluate ==="
 echo "tasks=$TASK_COUNT  k=$K  model=$MODEL  tag=$TAG"
 echo ""
+
+COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
+
+ensure_tsv_header() {
+  local path="$1"
+  local header="$2"
+  if [ -z "$path" ]; then
+    return
+  fi
+  mkdir -p "$(dirname "$path")"
+  if [ ! -s "$path" ]; then
+    printf '%s\n' "$header" > "$path"
+  fi
+}
+
+ensure_tsv_header "$TASK_OUTPUT" \
+  'commit	tag	model	task_name	k	pass_count	fail_count	error_count	statuses	pass@k	pass^k	trial_rate'
 
 # ── Helper: extract reward from a task-level Harbor result.json ──
 extract_reward_from_result_file() {
@@ -324,7 +344,7 @@ run_single_trial() {
 
   if [ -n "$latest_result" ]; then
     reward="$(extract_reward_from_result_file "$latest_result")"
-    echo "${reward:--1}"
+    printf '%s\t%s\n' "${reward:--1}" "$latest_result"
     return
   fi
 
@@ -332,14 +352,15 @@ run_single_trial() {
     # Harbor exited non-zero, but still may have written result.json
     reward=$(extract_reward_from_output "$run_output")
     if [ "$reward" != "-1" ]; then
-      echo "$reward"
+      printf '%s\t%s\n' "$reward" ""
     else
-      echo "-1"
+      printf '%s\t%s\n' "-1" ""
     fi
     return
   fi
 
-  extract_reward_from_output "$run_output"
+  reward="$(extract_reward_from_output "$run_output")"
+  printf '%s\t%s\n' "${reward:--1}" ""
 }
 
 # ── Main evaluation loop ──
@@ -366,19 +387,24 @@ while IFS= read -r task_name; do
   for trial in $(seq 1 "$K"); do
     echo -n "  trial $trial/$K ... "
 
-    result=$(run_single_trial "$task_name")
+    trial_output="$(run_single_trial "$task_name")"
+    IFS=$'\t' read -r result latest_result <<< "$trial_output"
+    status_word=""
 
     if [ "$result" = "1" ]; then
       task_pass=$((task_pass + 1))
       trial_results="${trial_results}P"
+      status_word="PASS"
       echo "PASS"
     elif [ "$result" = "0" ]; then
       task_fail=$((task_fail + 1))
       trial_results="${trial_results}F"
+      status_word="FAIL"
       echo "FAIL"
     else
       task_error=$((task_error + 1))
       trial_results="${trial_results}E"
+      status_word="ERROR"
       echo "ERROR"
     fi
 
@@ -411,8 +437,17 @@ while IFS= read -r task_name; do
   TASKS_ALL_PASS=$((TASKS_ALL_PASS + all_pass))
   TASKS_WITH_ERROR=$((TASKS_WITH_ERROR + has_error))
 
+  task_trial_rate="$(python3 -c "print(f'{$task_pass / $K:.4f}')")"
+
   echo "  => $task_name: $trial_results  ($task_pass/$K pass)  pass@k=$any_pass  pass^k=$all_pass"
   echo ""
+
+  if [ -n "$TASK_OUTPUT" ]; then
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$COMMIT" "$TAG" "$MODEL" "$task_name" "$K" \
+      "$task_pass" "$task_fail" "$task_error" "$trial_results" \
+      "$any_pass" "$all_pass" "$task_trial_rate" >> "$TASK_OUTPUT"
+  fi
 
 done < "$TASKS_TMP"
 
@@ -459,7 +494,6 @@ echo ""
 # ── Write machine-readable output ──
 if [ -n "$OUTPUT" ]; then
   # TSV line compatible with results.tsv
-  COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$COMMIT" "$PASS_AT_K" "$PASS_POW_K" "$AVG_TRIAL_RATE" \
     "$TASKS_ANY_PASS" "$TASKS_ALL_PASS" "$TOTAL_TRIAL_PASS" \
