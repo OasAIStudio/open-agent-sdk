@@ -91,7 +91,6 @@ cleanup() {
 
 build_commit_change_args() {
   local image="$1"
-  local -n out_ref="$2"
   local entrypoint_json=""
   local cmd_json=""
   local workdir=""
@@ -102,20 +101,20 @@ build_commit_change_args() {
   workdir="$(docker image inspect "$image" --format '{{.Config.WorkingDir}}')"
   user="$(docker image inspect "$image" --format '{{.Config.User}}')"
 
-  out_ref=()
+  COMMIT_CHANGE_ARGS=()
   if [ "$entrypoint_json" = "null" ]; then
-    out_ref+=(--change 'ENTRYPOINT []')
+    COMMIT_CHANGE_ARGS+=(--change 'ENTRYPOINT []')
   else
-    out_ref+=(--change "ENTRYPOINT ${entrypoint_json}")
+    COMMIT_CHANGE_ARGS+=(--change "ENTRYPOINT ${entrypoint_json}")
   fi
   if [ "$cmd_json" != "null" ]; then
-    out_ref+=(--change "CMD ${cmd_json}")
+    COMMIT_CHANGE_ARGS+=(--change "CMD ${cmd_json}")
   fi
   if [ -n "$workdir" ]; then
-    out_ref+=(--change "WORKDIR ${workdir}")
+    COMMIT_CHANGE_ARGS+=(--change "WORKDIR ${workdir}")
   fi
   if [ -n "$user" ]; then
-    out_ref+=(--change "USER ${user}")
+    COMMIT_CHANGE_ARGS+=(--change "USER ${user}")
   fi
 }
 
@@ -267,7 +266,7 @@ while IFS= read -r image; do
   fi
 
   COMMIT_CHANGE_ARGS=()
-  build_commit_change_args "$image" COMMIT_CHANGE_ARGS
+  build_commit_change_args "$image"
 
   container_name="oas-prewarm-$$"
 
